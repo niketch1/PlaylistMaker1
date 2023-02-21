@@ -13,8 +13,7 @@ class SettingsActivity : AppCompatActivity() {
         val back = findViewById<ImageView>(R.id.buttonBack)
 
         back.setOnClickListener {
-            val searchIntent = Intent(this, MainActivity::class.java)
-            startActivity(searchIntent)
+            finish()
         }
 
     }
