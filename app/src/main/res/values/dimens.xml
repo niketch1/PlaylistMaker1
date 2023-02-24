@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_padding">16dp</dimen>
+    <dimen name="main_text_size">22sp</dimen>
+    <dimen name="radius">16dp</dimen>
+    <dimen name="icon_padding">8dp</dimen>
+    <dimen name="settings_text_size">16sp</dimen>
+    <dimen name="settings_icon_margin_top">19dp</dimen>
+    <dimen name="settings_icon_margin_end">12dp</dimen>
+    <dimen name="settings_icon_margin_bot">18dp</dimen>
+    <dimen name="settings_text_margin_top">19dp</dimen>
+    <dimen name="settings_text_margin_start">12dp</dimen>
+    <dimen name="settings_text_margin_bot">18dp</dimen>
+</resources>
