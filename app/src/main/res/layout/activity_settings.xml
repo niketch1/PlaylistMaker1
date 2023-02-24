@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/arrow_back"
-            android:layout_marginTop="16dp"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp" />
 
         <TextView
@@ -24,15 +24,16 @@
             android:layout_height="wrap_content"
             android:text="@string/settings"
             android:textColor="@color/app_black"
-            android:textSize="22sp"
+            android:textSize="@dimen/main_text_size"
             android:layout_marginTop="14dp"
-            android:layout_marginStart="64dp" />
+            android:layout_marginStart="64dp"
+            android:layout_marginBottom="16dp"/>
         </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="24dp"
         android:orientation="horizontal">
 
         <TextView
@@ -46,12 +47,10 @@
             android:layout_marginStart="@dimen/settings_text_margin_start"/>
 
         <Switch
-            android:layout_width="56dp"
-            android:layout_height="48dp"
-            android:layout_gravity="end"
-            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="6dp"
-            android:layout_marginBottom="11dp"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
 
