@@ -39,7 +39,7 @@ class SettingsActivity : AppCompatActivity() {
             val theme = getString(R.string.theme)
             val supportIntent = Intent(Intent.ACTION_SENDTO)
             supportIntent.data = Uri.parse("mailto:")
-            supportIntent.putExtra(Intent.EXTRA_EMAIL, "niketch1@yandex.ru")
+            supportIntent.putExtra(Intent.EXTRA_EMAIL, getString(R.string.email))
             supportIntent.putExtra(Intent.EXTRA_SUBJECT, theme)
             supportIntent.putExtra(Intent.EXTRA_TEXT, messageSup)
             startActivity(supportIntent)
