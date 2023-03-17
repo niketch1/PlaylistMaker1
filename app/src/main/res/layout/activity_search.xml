@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    style="@style/BackgroundStyle">
+    android:orientation="vertical">
 
     <FrameLayout
         style="@style/FrameStyle">
@@ -18,7 +17,7 @@
             android:src="@drawable/arrow_back"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
-            style="@style/BackgroundStyle"/>
+            style="@style/TitleStyle"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -29,7 +28,7 @@
             android:layout_marginStart="64dp"
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/ys_display_medium"
-            style="@style/BackgroundStyle"/>
+            style="@style/TitleStyle"/>
     </FrameLayout>
 
     <FrameLayout
@@ -48,21 +47,20 @@
             android:maxLines="1"
             android:inputType="text"
             android:textColor="@color/black"
-            android:textColorHint="@color/gray"
+            android:textColorHint="@color/search_string_tint"
             android:background="@drawable/rounded_edittext_background"
             android:drawableLeft="@drawable/search_icon"
             android:drawablePadding="9dp"
-            android:paddingLeft="13dp"
-
-/>
+            android:paddingLeft="13dp" />
 
         <ImageView
             android:id="@+id/clearIcon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
-            android:background="@color/gray1"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            android:layout_marginEnd="12dp"
+            android:background="@color/search_string"
+            android:src="@drawable/clear"
             android:visibility="gone" />
     </FrameLayout>
 </LinearLayout>
