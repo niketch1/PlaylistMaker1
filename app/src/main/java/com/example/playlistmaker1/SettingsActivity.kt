@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageView
 
 class SettingsActivity : AppCompatActivity() {
@@ -14,7 +15,7 @@ class SettingsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val back = findViewById<ImageView>(R.id.buttonBack)
+        val back = findViewById<FrameLayout>(R.id.buttonBack)
 
         back.setOnClickListener {
             finish()
