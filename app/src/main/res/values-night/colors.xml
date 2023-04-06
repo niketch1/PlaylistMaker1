@@ -13,4 +13,6 @@
     <color name="gray1">#E6E8EB</color>
     <color name="search_string">#FFFFFFFF</color>
     <color name="search_string_tint">#1A1B22</color>
+    <color name="something_wrong">#FFFFFFFF</color>
+    <color name="something_wrong_background">#1A1B22</color>
 </resources>

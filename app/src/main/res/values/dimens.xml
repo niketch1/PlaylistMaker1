@@ -13,4 +13,7 @@
     <dimen name="settings_text_margin_bot">18dp</dimen>
     <dimen name="track_text_size">16sp</dimen>
     <dimen name="artist_text_size">11sp</dimen>
+    <dimen name="something_wrong_size">19sp</dimen>
+    <dimen name="button_refresh">14sp</dimen>
+    <dimen name="button_refresh_radius">54dp</dimen>
 </resources>
