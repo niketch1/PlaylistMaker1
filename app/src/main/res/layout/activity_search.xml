@@ -58,7 +58,9 @@
             android:drawablePadding="9dp"
             android:paddingLeft="13dp"
             android:textSize="@dimen/track_text_size"
-            android:fontFamily="@font/ys_display_regular"/>
+            android:fontFamily="@font/ys_display_regular"
+            android:imeOptions="actionDone"
+            android:singleLine="true"/> />
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -71,13 +73,51 @@
             android:visibility="gone" />
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:paddingTop="16dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:itemCount="7"
-        tools:listitem="@layout/track_item" />
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:paddingTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:itemCount="7"
+            tools:listitem="@layout/track_item" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center|top"
+            android:layout_marginTop="105dp">
+
+        <ImageView
+            android:id="@+id/placeholderIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            tools:src="@drawable/nothing_found"/>
+
+        <TextView android:id="@+id/placeholderMessage"
+            android:layout_width="312dp"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textSize="@dimen/something_wrong_size"
+            android:fontFamily="@font/ys_display_medium"
+            android:textColor="@color/something_wrong"
+            android:layout_marginBottom="16dp"
+            tools:text="Проблемы со связью"/>
+
+        <Button
+            android:id="@+id/buttonRefresh"
+            android:foreground="?attr/selectableItemBackground"
+            style="@style/RefreshButtonStyle"
+            android:text="@string/refresh"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>
