@@ -1,5 +1,6 @@
 package com.example.playlistmaker1
 
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -10,13 +11,22 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
+const val PLAYLIST_PREFERENCES = "playlistPreferences"
+const val NEW_TRACK_KEY = "newTrackKey"
+const val TRACK_LIST_KEY = "trackListKey"
+
 class SearchActivity : AppCompatActivity() {
+
+    val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
     private val iTunesBaseUrl = "https://itunes.apple.com"
 
@@ -28,13 +38,22 @@ class SearchActivity : AppCompatActivity() {
     private val ITunesService = retrofit.create(iTunesSearchAPI::class.java)
     var str : String = ""
     private val tracks = ArrayList<Track>()
-    val trackAdapter = TrackAdapter()
+    private val searchedTracks = ArrayList<Track>()
+    val searchedTrackAdapter = SearchedTrackAdapter()
+    val trackAdapter = TrackAdapter{
+        showSearched(it)
+    }
 
     private lateinit var inputEditText: EditText
     private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewYouSearched: RecyclerView
     private lateinit var placeholderMessage: TextView
     private lateinit var placeholderIcon: ImageView
     private lateinit var buttonRefresh: Button
+    private lateinit var buttonClearStory: Button
+    private lateinit var youSearched: TextView
+    private lateinit var listener: SharedPreferences.OnSharedPreferenceChangeListener
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,12 +63,36 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.setText(str)
 
         recyclerView = findViewById(R.id.recyclerView)
+        recyclerViewYouSearched = findViewById(R.id.recyclerViewYouSearched)
         trackAdapter.tracks = tracks
+        searchedTrackAdapter.tracks = searchedTracks
         recyclerView.adapter = trackAdapter
+        recyclerViewYouSearched.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recyclerViewYouSearched.adapter = searchedTrackAdapter
 
         placeholderMessage = findViewById(R.id.placeholderMessage)
         placeholderIcon = findViewById(R.id.placeholderIcon)
         buttonRefresh = findViewById(R.id.buttonRefresh)
+        buttonClearStory = findViewById(R.id.buttonClearStory)
+        youSearched = findViewById(R.id.youSearched)
+        youSearched.text = getString(R.string.youSearched)
+
+
+        sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
+        val searchedTracksAfterStopActivity = sharedPreferences.getString(TRACK_LIST_KEY, null)
+        if (searchedTracksAfterStopActivity != null) {
+            searchedTracks.clear()
+            searchedTracks.addAll(createTrackListFromJson(searchedTracksAfterStopActivity))
+            searchedTrackAdapter.notifyDataSetChanged()
+        }
+
+        buttonClearStory.setOnClickListener {
+            searchedTracks.clear()
+            searchedTrackAdapter.notifyDataSetChanged()
+            youSearched.visibility = View.GONE
+            recyclerViewYouSearched.visibility = View.GONE
+            buttonClearStory.visibility = View.GONE
+        }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -68,6 +111,22 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             inputEditText.setText("")
             inputEditText.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            tracks.clear()
+            trackAdapter.notifyDataSetChanged()
+        }
+
+        inputEditText.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus && inputEditText.text.isEmpty()){
+                tracks.clear()
+                trackAdapter.notifyDataSetChanged()
+                youSearched.visibility = View.VISIBLE
+                recyclerViewYouSearched.visibility = View.VISIBLE
+                buttonClearStory.visibility = View.VISIBLE
+            } else {
+                youSearched.visibility = View.GONE
+                recyclerViewYouSearched.visibility = View.GONE
+                buttonClearStory.visibility = View.GONE
+            }
         }
 
         val simpleTextWatcher = object : TextWatcher {
@@ -76,7 +135,17 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
+                if (inputEditText.hasFocus() && s?.isEmpty() == true) {
+                    tracks.clear()
+                    trackAdapter.notifyDataSetChanged()
+                    youSearched.visibility = View.VISIBLE
+                    recyclerViewYouSearched.visibility = View.VISIBLE
+                    buttonClearStory.visibility = View.VISIBLE
+                } else {
+                    youSearched.visibility = View.GONE
+                    recyclerViewYouSearched.visibility = View.GONE
+                    buttonClearStory.visibility = View.GONE
+                }
                 clearButton.visibility = clearButtonVisibility(s)
                 str = s.toString()
             }
@@ -86,10 +155,37 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
+
+
+
+        listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+            if (key == NEW_TRACK_KEY) {
+                val track = sharedPreferences.getString(NEW_TRACK_KEY, null)
+                var listHasBeenUpdated = false
+                if (track != null) {
+                    for (i in searchedTracks.indices) {
+                        if (searchedTracks[i].trackId == createTrackFromJson(track).trackId) {
+                            searchedTracks.add(0, createTrackFromJson(track))
+                            searchedTracks.removeAt(i+1)
+                            listHasBeenUpdated = true
+                        }
+                    }
+                    if (!listHasBeenUpdated) {
+                        searchedTracks.add(0, createTrackFromJson(track))
+                    }
+                    if(searchedTracks.size > SEARCHED_TRACK_SIZE) {
+                        searchedTracks.removeAt(searchedTracks.size-1)
+                    }
+                     searchedTrackAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
     companion object {
         const val ENTERED_TEXT = "ENTERED_TEXT"
+        const val SEARCHED_TRACK_SIZE = 10
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -168,4 +264,35 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun showSearched(track: Track) {
+        val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
+        sharedPreferences.edit()
+            .putString(NEW_TRACK_KEY, createJsonFromTrack(track))
+            .apply()
+        Log.d("LISTENER", "нажал")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        sharedPreferences.edit()
+            .putString(TRACK_LIST_KEY, createJsonFromTrackList(searchedTracks))
+            .apply()
+        Log.d("LISTENER", "$(createJsonFromTrackList(searchedTracks))")
+    }
+
+    private fun createJsonFromTrack(track: Track): String {
+        return Gson().toJson(track)
+    }
+
+    private fun createTrackFromJson(json: String): Track{
+        return Gson().fromJson(json, Track::class.java)
+    }
+
+    private fun createJsonFromTrackList(trackList: ArrayList<Track>): String {
+        return Gson().toJson(trackList)
+    }
+
+    private fun createTrackListFromJson(json: String): ArrayList<Track>{
+        return Gson().fromJson(json, itemType)
+    }
 }

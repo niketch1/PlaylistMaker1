@@ -1,13 +1,17 @@
 package com.example.playlistmaker1
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
+import com.google.android.material.switchmaterial.SwitchMaterial
+
 
 class SettingsActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -52,6 +56,23 @@ class SettingsActivity : AppCompatActivity() {
             val agreementIntent = Intent(Intent.ACTION_VIEW)
             agreementIntent.data = Uri.parse(getString(R.string.offer))
             startActivity(agreementIntent)
+        }
+
+        val themeSwitcher = findViewById<SwitchMaterial>(R.id.themeSwitcher)
+        themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
+            (applicationContext as App).switchTheme(checked)
+        }
+    }
+    companion object{
+        fun darkThemeCheck(context: Context):Boolean{
+
+            var isNight = false
+            val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+            isNight = when ((currentNightMode)) {
+                Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+            return isNight
         }
     }
 }
