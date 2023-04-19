@@ -1,10 +1,8 @@
 package com.example.playlistmaker1
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,19 +25,11 @@ class TrackViewHolder(parent: ViewGroup) :
         Glide.with(itemView)
             .load(item.artworkUrl100)
             .centerCrop()
-            .placeholder(R.drawable.placeholder)
-            .transform(RoundedCorners(2))
+            .placeholder(R.drawable.icon_placeholder)
+            .transform(RoundedCorners(itemView.resources.getDimensionPixelSize(R.dimen.track_icon_radius)))
             .into(trackImage)
 
-        val name = item.trackName
-
-        if(name.count() >= 30) {
-           val name1 = name.dropLast(name.count() - 30).padEnd(33, '.')
-           trackName.text = name1
-        }
-        else {
-           trackName.text = name
-        }
+        trackName.text = item.trackName
         artistName.text = item.artistName
         trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(item.trackTimeMillis)
     }

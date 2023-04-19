@@ -5,14 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,12 +19,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 const val PLAYLIST_PREFERENCES = "playlistPreferences"
-const val NEW_TRACK_KEY = "newTrackKey"
-const val TRACK_LIST_KEY = "trackListKey"
+
 
 class SearchActivity : AppCompatActivity() {
-
-    val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
     private val iTunesBaseUrl = "https://itunes.apple.com"
 
@@ -37,10 +32,8 @@ class SearchActivity : AppCompatActivity() {
 
     private val ITunesService = retrofit.create(iTunesSearchAPI::class.java)
     var str : String = ""
-    private val tracks = ArrayList<Track>()
-    private val searchedTracks = ArrayList<Track>()
-    val searchedTrackAdapter = SearchedTrackAdapter()
-    val trackAdapter = TrackAdapter{
+    private val searchedTrackAdapter = SearchedTrackAdapter()
+    private val trackAdapter = TrackAdapter{
         showSearched(it)
     }
 
@@ -64,8 +57,6 @@ class SearchActivity : AppCompatActivity() {
 
         recyclerView = findViewById(R.id.recyclerView)
         recyclerViewYouSearched = findViewById(R.id.recyclerViewYouSearched)
-        trackAdapter.tracks = tracks
-        searchedTrackAdapter.tracks = searchedTracks
         recyclerView.adapter = trackAdapter
         recyclerViewYouSearched.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerViewYouSearched.adapter = searchedTrackAdapter
@@ -79,23 +70,18 @@ class SearchActivity : AppCompatActivity() {
 
 
         sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
-        val searchedTracksAfterStopActivity = sharedPreferences.getString(TRACK_LIST_KEY, null)
-        if (searchedTracksAfterStopActivity != null) {
-            searchedTracks.clear()
-            searchedTracks.addAll(createTrackListFromJson(searchedTracksAfterStopActivity))
-            searchedTrackAdapter.notifyDataSetChanged()
-        }
+        val searchHistory = SearchHistory(sharedPreferences)
+        searchHistory.reloadTracks(searchedTrackAdapter)
 
         buttonClearStory.setOnClickListener {
-            searchedTracks.clear()
-            searchedTrackAdapter.notifyDataSetChanged()
+            searchedTrackAdapter.setTracks(null)
             youSearched.visibility = View.GONE
             recyclerViewYouSearched.visibility = View.GONE
             buttonClearStory.visibility = View.GONE
         }
 
         inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
+            if (actionId == EditorInfo.IME_ACTION_DONE && !inputEditText.text.isEmpty()) {
                 search()
                 true
             }
@@ -110,18 +96,22 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.clearIcon)
         clearButton.setOnClickListener {
             inputEditText.setText("")
-            inputEditText.onEditorAction(EditorInfo.IME_ACTION_DONE)
-            tracks.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackAdapter.setTracks(null)
+            showMessage("", "")
         }
 
         inputEditText.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus && inputEditText.text.isEmpty()){
-                tracks.clear()
-                trackAdapter.notifyDataSetChanged()
-                youSearched.visibility = View.VISIBLE
-                recyclerViewYouSearched.visibility = View.VISIBLE
-                buttonClearStory.visibility = View.VISIBLE
+                trackAdapter.setTracks(null)
+                if(searchedTrackAdapter.isSearchedTrackListEmpty()){
+                    youSearched.visibility = View.GONE
+                    recyclerViewYouSearched.visibility = View.GONE
+                    buttonClearStory.visibility = View.GONE
+                } else{
+                    youSearched.visibility = View.VISIBLE
+                    recyclerViewYouSearched.visibility = View.VISIBLE
+                    buttonClearStory.visibility = View.VISIBLE
+                }
             } else {
                 youSearched.visibility = View.GONE
                 recyclerViewYouSearched.visibility = View.GONE
@@ -136,11 +126,16 @@ class SearchActivity : AppCompatActivity() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (inputEditText.hasFocus() && s?.isEmpty() == true) {
-                    tracks.clear()
-                    trackAdapter.notifyDataSetChanged()
-                    youSearched.visibility = View.VISIBLE
-                    recyclerViewYouSearched.visibility = View.VISIBLE
-                    buttonClearStory.visibility = View.VISIBLE
+                    trackAdapter.setTracks(null)
+                    if(searchedTrackAdapter.isSearchedTrackListEmpty()){
+                        youSearched.visibility = View.GONE
+                        recyclerViewYouSearched.visibility = View.GONE
+                        buttonClearStory.visibility = View.GONE
+                    } else{
+                        youSearched.visibility = View.VISIBLE
+                        recyclerViewYouSearched.visibility = View.VISIBLE
+                        buttonClearStory.visibility = View.VISIBLE
+                    }
                 } else {
                     youSearched.visibility = View.GONE
                     recyclerViewYouSearched.visibility = View.GONE
@@ -159,26 +154,7 @@ class SearchActivity : AppCompatActivity() {
 
 
         listener = SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            if (key == NEW_TRACK_KEY) {
-                val track = sharedPreferences.getString(NEW_TRACK_KEY, null)
-                var listHasBeenUpdated = false
-                if (track != null) {
-                    for (i in searchedTracks.indices) {
-                        if (searchedTracks[i].trackId == createTrackFromJson(track).trackId) {
-                            searchedTracks.add(0, createTrackFromJson(track))
-                            searchedTracks.removeAt(i+1)
-                            listHasBeenUpdated = true
-                        }
-                    }
-                    if (!listHasBeenUpdated) {
-                        searchedTracks.add(0, createTrackFromJson(track))
-                    }
-                    if(searchedTracks.size > SEARCHED_TRACK_SIZE) {
-                        searchedTracks.removeAt(searchedTracks.size-1)
-                    }
-                     searchedTrackAdapter.notifyDataSetChanged()
-                }
-            }
+            searchHistory.addToHistory(searchedTrackAdapter, key)
         }
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
@@ -186,6 +162,8 @@ class SearchActivity : AppCompatActivity() {
     companion object {
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val SEARCHED_TRACK_SIZE = 10
+        const val NEW_TRACK_KEY = "newTrackKey"
+        const val TRACK_LIST_KEY = "trackListKey"
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -216,9 +194,7 @@ class SearchActivity : AppCompatActivity() {
 
                     if (response.code() == 200) {
                         if (response.body()?.results?.isNotEmpty() == true) {
-                            tracks.clear()
-                            tracks.addAll(response.body()?.results!!)
-                            trackAdapter.notifyDataSetChanged()
+                            trackAdapter.setTracks(response.body()?.results!!)
                             showMessage("", "")
                         }
                         else {
@@ -243,8 +219,7 @@ class SearchActivity : AppCompatActivity() {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             placeholderIcon.visibility = View.VISIBLE
-            tracks.clear()
-            trackAdapter.notifyDataSetChanged()
+            trackAdapter.setTracks(null)
             placeholderMessage.text = text
             if (additionalMessage.isNotEmpty()) {
                 Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG)
@@ -269,30 +244,17 @@ class SearchActivity : AppCompatActivity() {
         sharedPreferences.edit()
             .putString(NEW_TRACK_KEY, createJsonFromTrack(track))
             .apply()
-        Log.d("LISTENER", "нажал")
     }
 
     override fun onStop() {
         super.onStop()
         sharedPreferences.edit()
-            .putString(TRACK_LIST_KEY, createJsonFromTrackList(searchedTracks))
+            .putString(TRACK_LIST_KEY, searchedTrackAdapter.createJsonFromTrackList())
             .apply()
-        Log.d("LISTENER", "$(createJsonFromTrackList(searchedTracks))")
     }
 
     private fun createJsonFromTrack(track: Track): String {
         return Gson().toJson(track)
     }
 
-    private fun createTrackFromJson(json: String): Track{
-        return Gson().fromJson(json, Track::class.java)
-    }
-
-    private fun createJsonFromTrackList(trackList: ArrayList<Track>): String {
-        return Gson().toJson(trackList)
-    }
-
-    private fun createTrackListFromJson(json: String): ArrayList<Track>{
-        return Gson().fromJson(json, itemType)
-    }
 }

@@ -1,8 +1,9 @@
 package com.example.playlistmaker1
 
 import android.app.Application
+import android.content.Context
+import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker1.SettingsActivity.Companion.darkThemeCheck
 
 const val THEME_PREFERENCES = "themePreferences"
 const val EDIT_BOOLEAN_KEY = "editBooleanKey"
@@ -27,5 +28,16 @@ class App : Application() {
                 AppCompatDelegate.MODE_NIGHT_NO
             }
         )
+    }
+
+    fun darkThemeCheck(context: Context):Boolean{
+
+        var isNight = false
+        val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        isNight = when ((currentNightMode)) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            else -> false
+        }
+        return isNight
     }
 }
