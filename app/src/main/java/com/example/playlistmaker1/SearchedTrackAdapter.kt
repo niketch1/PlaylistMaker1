@@ -5,14 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 
-class SearchedTrackAdapter : RecyclerView.Adapter<TrackViewHolder> () {
+class SearchedTrackAdapter(val clickListener: TrackAdapter.TrackClickListener) : RecyclerView.Adapter<TrackViewHolder> () {
 
     private val tracks = mutableListOf<Track>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder = TrackViewHolder(parent)
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
-    }
+        holder.itemView.setOnClickListener { clickListener.onTrackClick(tracks.get(position))}
+        }
 
     override fun getItemCount(): Int {
         return tracks.size

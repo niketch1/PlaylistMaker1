@@ -15,4 +15,6 @@
     <color name="search_string_tint">#AEAFB4</color>
     <color name="something_wrong">#1A1B22</color>
     <color name="something_wrong_background">#FFFFFFFF</color>
+    <color name="buttons_add_and_like">#401A1B22</color>
+    <color name="track_information">#1A1B22</color>
 </resources>
