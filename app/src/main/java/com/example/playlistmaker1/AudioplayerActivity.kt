@@ -1,6 +1,7 @@
 package com.example.playlistmaker1
 
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageButton
@@ -37,7 +38,6 @@ class AudioplayerActivity : AppCompatActivity() {
         val trackCountry = findViewById<TextView>(R.id.trackCountry)
         val currentTrackTime = findViewById<TextView>(R.id.currentTrackTime)
         currentTrackTime.text = "0:00"
-
         val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
 
         val pressedTrack = sharedPreferences?.getString(SearchActivity.NEW_TRACK_KEY, null)

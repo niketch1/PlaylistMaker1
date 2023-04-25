@@ -31,7 +31,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
         android:background="@null"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -46,8 +45,7 @@
         app:layout_constrainedWidth="true"
         app:layout_constrainedHeight="true"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:scaleType="centerCrop"
         app:layout_constraintDimensionRatio="1:1"
@@ -91,11 +89,11 @@
         android:layout_marginBottom="29dp"
         android:layout_marginStart="8dp"
         android:src="@drawable/add_track"
-        app:elevation="1dp"
+        app:elevation="0dp"
         app:pressedTranslationZ="1dp"
         app:borderWidth="0dp"
         app:fabCustomSize="51dp"
-        android:backgroundTint="@android:color/darker_gray"
+        android:backgroundTint="@color/player_buttons"
         app:tint="@android:color/white"
         android:clickable="true"
         app:layout_constraintBottom_toTopOf="@id/currentTrackTime"
@@ -123,11 +121,11 @@
         android:layout_height="51dp"
         android:layout_marginEnd="8dp"
         android:src="@drawable/like"
-        app:elevation="1dp"
+        app:elevation="0dp"
         app:pressedTranslationZ="1dp"
         app:borderWidth="0dp"
         app:fabCustomSize="51dp"
-        android:backgroundTint="@android:color/darker_gray"
+        android:backgroundTint="@color/player_buttons"
         app:tint="@android:color/white"
         android:clickable="true"
         app:layout_constraintStart_toEndOf="@id/playButton"
@@ -156,11 +154,15 @@
 
     <TextView
         android:id="@+id/trackTime"
-        tools:text="0:00"
+        tools:text="0:000000000000000000000000000000000000000000000"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         style="@style/TrackInformationStyle"
         android:textColor="@color/track_information"
-        app:layout_constraintBaseline_toBaselineOf="@id/duration"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/duration"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintWidth_max="@dimen/max_track_info"
+        app:layout_constraintHorizontal_bias="1.0"/>
 
     <TextView
         android:id="@+id/album"
@@ -178,7 +180,11 @@
         style="@style/TrackInformationStyle"
         android:textColor="@color/track_information"
         app:layout_constraintBaseline_toBaselineOf="@id/album"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:lines="1"
+        android:ellipsize="end"
+
+        app:layout_constraintHorizontal_bias="1.0"/>
 
     <TextView
         android:id="@+id/year"
@@ -190,11 +196,16 @@
 
     <TextView
         android:id="@+id/trackYear"
-        tools:text="1900"
+        tools:text="190018888888888888888888888888888888881"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
+        app:layout_constraintStart_toEndOf="@id/year"
         style="@style/TrackInformationStyle"
         android:textColor="@color/track_information"
-        app:layout_constraintBaseline_toBaselineOf="@id/year"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/year"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintWidth_max="@dimen/max_track_info"
+        app:layout_constraintHorizontal_bias="1.0"/>
 
     <TextView
         android:id="@+id/genre"
@@ -206,11 +217,16 @@
 
     <TextView
         android:id="@+id/trackGenre"
-        tools:text="Rock"
+        tools:text="Rockaaaaaaaaaaaaaaasssssaaaaaaaaasssssssssssssaaaaaaaa"
+        app:layout_constraintStart_toEndOf="@id/genre"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         style="@style/TrackInformationStyle"
         android:textColor="@color/track_information"
-        app:layout_constraintBaseline_toBaselineOf="@id/genre"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/genre"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintWidth_max="@dimen/max_track_info"
+        app:layout_constraintHorizontal_bias="1.0"/>
 
     <TextView
         android:id="@+id/country"
@@ -222,10 +238,14 @@
 
     <TextView
         android:id="@+id/trackCountry"
-        tools:text="Япония"
+        tools:text="Японияaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         app:layout_constraintEnd_toEndOf="@id/rightBorder"
         style="@style/TrackInformationStyle"
         android:textColor="@color/track_information"
-        app:layout_constraintBaseline_toBaselineOf="@id/country"/>
+        app:layout_constraintBaseline_toBaselineOf="@id/country"
+        android:lines="1"
+        android:ellipsize="end"
+        app:layout_constraintWidth_max="@dimen/max_track_info"
+        app:layout_constraintHorizontal_bias="1.0"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

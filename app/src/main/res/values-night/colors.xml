@@ -17,4 +17,5 @@
     <color name="something_wrong_background">#1A1B22</color>
     <color name="buttons_add_and_like">#401A1B22</color>
     <color name="track_information">#FFFFFFFF</color>
+    <color name="player_buttons">#40FFFFFF</color>
 </resources>
