@@ -1,5 +1,6 @@
 package com.example.playlistmaker1
 
+import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -23,7 +24,7 @@ const val PLAYLIST_PREFERENCES = "playlistPreferences"
 
 class SearchActivity : AppCompatActivity() {
 
-    private val iTunesBaseUrl = "https://itunes.apple.com"
+    private val iTunesBaseUrl = "http://itunes.apple.com"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(iTunesBaseUrl)
@@ -32,7 +33,9 @@ class SearchActivity : AppCompatActivity() {
 
     private val ITunesService = retrofit.create(iTunesSearchAPI::class.java)
     var str : String = ""
-    private val searchedTrackAdapter = SearchedTrackAdapter()
+    private val searchedTrackAdapter = SearchedTrackAdapter{
+        showSearched(it)
+    }
     private val trackAdapter = TrackAdapter{
         showSearched(it)
     }
@@ -244,6 +247,7 @@ class SearchActivity : AppCompatActivity() {
         sharedPreferences.edit()
             .putString(NEW_TRACK_KEY, createJsonFromTrack(track))
             .apply()
+        navigateTo(AudioplayerActivity::class.java)
     }
 
     override fun onStop() {
@@ -255,6 +259,11 @@ class SearchActivity : AppCompatActivity() {
 
     private fun createJsonFromTrack(track: Track): String {
         return Gson().toJson(track)
+    }
+
+    private fun navigateTo(clazz: Class<out AppCompatActivity>) {
+        val intent = Intent(this, clazz)
+        startActivity(intent)
     }
 
 }
