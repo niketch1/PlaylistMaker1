@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -24,6 +26,8 @@ const val PLAYLIST_PREFERENCES = "playlistPreferences"
 
 class SearchActivity : AppCompatActivity() {
 
+    private var mainThreadHandler: Handler? = null
+
     private val iTunesBaseUrl = "http://itunes.apple.com"
 
     private val retrofit = Retrofit.Builder()
@@ -40,6 +44,7 @@ class SearchActivity : AppCompatActivity() {
         showSearched(it)
     }
 
+    private lateinit var progressBar: ProgressBar
     private lateinit var inputEditText: EditText
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewYouSearched: RecyclerView
@@ -55,6 +60,8 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
+        mainThreadHandler = Handler(Looper.getMainLooper())
+
         inputEditText = findViewById(R.id.inputEditText)
         inputEditText.setText(str)
 
@@ -64,6 +71,7 @@ class SearchActivity : AppCompatActivity() {
         recyclerViewYouSearched.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recyclerViewYouSearched.adapter = searchedTrackAdapter
 
+        progressBar = findViewById(R.id.progressBar)
         placeholderMessage = findViewById(R.id.placeholderMessage)
         placeholderIcon = findViewById(R.id.placeholderIcon)
         buttonRefresh = findViewById(R.id.buttonRefresh)
@@ -81,14 +89,6 @@ class SearchActivity : AppCompatActivity() {
             youSearched.visibility = View.GONE
             recyclerViewYouSearched.visibility = View.GONE
             buttonClearStory.visibility = View.GONE
-        }
-
-        inputEditText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE && !inputEditText.text.isEmpty()) {
-                search()
-                true
-            }
-            false
         }
 
         val back = findViewById<FrameLayout>(R.id.buttonBack)
@@ -128,6 +128,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                searchDebounce()
                 if (inputEditText.hasFocus() && s?.isEmpty() == true) {
                     trackAdapter.setTracks(null)
                     if(searchedTrackAdapter.isSearchedTrackListEmpty()){
@@ -162,11 +163,10 @@ class SearchActivity : AppCompatActivity() {
         sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
     }
 
-    companion object {
-        const val ENTERED_TEXT = "ENTERED_TEXT"
-        const val SEARCHED_TRACK_SIZE = 10
-        const val NEW_TRACK_KEY = "newTrackKey"
-        const val TRACK_LIST_KEY = "trackListKey"
+    private val searchRunnable = Runnable { search() }
+    private fun searchDebounce() {
+        mainThreadHandler?.removeCallbacks(searchRunnable)
+        mainThreadHandler?.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -188,13 +188,15 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun search() {
+        progressBar.visibility = View.VISIBLE
+        trackAdapter.setTracks(null)
         ITunesService.search(inputEditText.text.toString())
             .enqueue(object : Callback<ITunesResponse> {
                 override fun onResponse(
                     call: Call<ITunesResponse>,
                     response: Response<ITunesResponse>
                 ) {
-
+                    progressBar.visibility = View.GONE
                     if (response.code() == 200) {
                         if (response.body()?.results?.isNotEmpty() == true) {
                             trackAdapter.setTracks(response.body()?.results!!)
@@ -211,6 +213,7 @@ class SearchActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<ITunesResponse>, t: Throwable) {
+                    progressBar.visibility = View.GONE
                     showMessage(getString(R.string.something_went_wrong), t.message.toString())
                     placeholderIcon.setImageResource(R.drawable.internet_connection)
                 }
@@ -222,7 +225,6 @@ class SearchActivity : AppCompatActivity() {
         if (text.isNotEmpty()) {
             placeholderMessage.visibility = View.VISIBLE
             placeholderIcon.visibility = View.VISIBLE
-            trackAdapter.setTracks(null)
             placeholderMessage.text = text
             if (additionalMessage.isNotEmpty()) {
                 Toast.makeText(applicationContext, additionalMessage, Toast.LENGTH_LONG)
@@ -242,6 +244,16 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private var isClickAllowed = true
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            mainThreadHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
     private fun showSearched(track: Track) {
         val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
         sharedPreferences.edit()
@@ -262,8 +274,17 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun navigateTo(clazz: Class<out AppCompatActivity>) {
-        val intent = Intent(this, clazz)
-        startActivity(intent)
+        if (clickDebounce()) {
+            val intent = Intent(this, clazz)
+            startActivity(intent)
+        }
     }
-
+    companion object {
+        const val ENTERED_TEXT = "ENTERED_TEXT"
+        const val SEARCHED_TRACK_SIZE = 10
+        const val NEW_TRACK_KEY = "newTrackKey"
+        const val TRACK_LIST_KEY = "trackListKey"
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
+    }
 }

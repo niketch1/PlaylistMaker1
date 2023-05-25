@@ -120,7 +120,23 @@
             app:layout_constraintBottom_toTopOf="@id/currentTrackTime"
             app:layout_constraintEnd_toStartOf="@id/likeButton"
             style="@style/TitleStyle"
-            android:foreground="?attr/selectableItemBackground"/>
+            android:foreground="?attr/selectableItemBackground"
+            android:visibility="visible"/>
+
+        <ImageButton
+            android:id="@+id/pauseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintCircleRadius="69dp"
+            android:layout_marginBottom="12dp"
+            app:srcCompat="@drawable/pause"
+            android:background="@null"
+            app:layout_constraintStart_toEndOf="@id/addButton"
+            app:layout_constraintBottom_toTopOf="@id/currentTrackTime"
+            app:layout_constraintEnd_toStartOf="@id/likeButton"
+            style="@style/TitleStyle"
+            android:foreground="?attr/selectableItemBackground"
+            android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/likeButton"
@@ -154,7 +170,7 @@
             android:id="@+id/duration"
             android:layout_marginBottom="@dimen/track_information_gap"
             app:layout_goneMarginBottom="17dp"
-            android:text="Длительность"
+            android:text="@string/duration"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintBottom_toTopOf="@id/album"
             style="@style/TrackInformationStyle" />
@@ -176,7 +192,7 @@
         <TextView
             android:id="@+id/album"
             android:layout_marginBottom="@dimen/track_information_gap"
-            android:text="Альбом"
+            android:text="@string/album"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintBottom_toTopOf="@id/year"
             style="@style/TrackInformationStyle"
@@ -200,7 +216,7 @@
         <TextView
             android:id="@+id/year"
             android:layout_marginBottom="@dimen/track_information_gap"
-            android:text="Год"
+            android:text="@string/year"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintBottom_toTopOf="@id/genre"
             style="@style/TrackInformationStyle" />
@@ -222,7 +238,7 @@
         <TextView
             android:id="@+id/genre"
             android:layout_marginBottom="@dimen/track_information_gap"
-            android:text="Жанр"
+            android:text="@string/genre"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintBottom_toTopOf="@id/country"
             style="@style/TrackInformationStyle" />
@@ -244,7 +260,7 @@
         <TextView
             android:id="@+id/country"
             android:layout_marginBottom="28dp"
-            android:text="Страна"
+            android:text="@string/country"
             app:layout_constraintStart_toStartOf="@+id/leftBorder"
             app:layout_constraintBottom_toBottomOf="parent"
             style="@style/TrackInformationStyle" />
