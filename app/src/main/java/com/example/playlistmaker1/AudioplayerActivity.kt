@@ -7,10 +7,8 @@ import android.os.Looper
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.postDelayed
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.gson.Gson
@@ -22,12 +20,13 @@ import java.util.Locale
 
 class AudioplayerActivity : AppCompatActivity() {
 
+    private var dateFormatUtil = DateFormatUtil()
     private var mediaPlayer = MediaPlayer()
     private lateinit var url : String
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
-    val timer = getCurrentTime()
+    val timerRunnable = getCurrentTime()
     private var mainThreadHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,7 +52,7 @@ class AudioplayerActivity : AppCompatActivity() {
         val trackGenre = findViewById<TextView>(R.id.trackGenre)
         val trackCountry = findViewById<TextView>(R.id.trackCountry)
         currentTrackTime = findViewById(R.id.currentTrackTime)
-        currentTrackTime.text = "00:00"
+        currentTrackTime.text = getString(R.string.start_time)
         playButton = findViewById(R.id.playButton)
         pauseButton = findViewById(R.id.pauseButton)
         val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
@@ -71,12 +70,11 @@ class AudioplayerActivity : AppCompatActivity() {
             url = convertedTrack.previewUrl
             trackName.text = convertedTrack.trackName
             artistName.text = convertedTrack.artistName
-            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(convertedTrack.trackTimeMillis)
+            trackTime.text = dateFormatUtil.convertLongTimeToString(convertedTrack.trackTimeMillis)
             trackAlbum.text = convertedTrack.collectionName
-            trackAlbum?.visibility = View.VISIBLE
-            album?.visibility = View.VISIBLE
-            val date = SimpleDateFormat("yyyy", Locale.getDefault()).parse(convertedTrack.releaseDate)
-            trackYear?.text = SimpleDateFormat("yyyy", Locale.getDefault()).format(date as Date)
+            trackAlbum.visibility = View.VISIBLE
+            album.visibility = View.VISIBLE
+            trackYear?.text = dateFormatUtil.convertYearToString(convertedTrack.releaseDate)
             trackGenre.text = convertedTrack.primaryGenreName
             trackCountry.text = convertedTrack.country
 
@@ -92,11 +90,8 @@ class AudioplayerActivity : AppCompatActivity() {
     private fun getCurrentTime() : Runnable {
         return object : Runnable {
             override fun run() {
-                currentTrackTime.text = SimpleDateFormat(
-                    "mm:ss",
-                    Locale.getDefault()
-                ).format(mediaPlayer.currentPosition)
-                mainThreadHandler?.postDelayed(this, DELAY)
+                currentTrackTime.text = dateFormatUtil.convertIntTimeToString(mediaPlayer.currentPosition)
+                mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
             }
         }
     }
@@ -114,11 +109,11 @@ class AudioplayerActivity : AppCompatActivity() {
             playerState = STATE_PREPARED
         }
         mediaPlayer.setOnCompletionListener {
-            mainThreadHandler?.removeCallbacks(timer)
+            mainThreadHandler?.removeCallbacks(timerRunnable)
             playerState = STATE_PREPARED
             pauseButton.visibility = View.GONE
             playButton.visibility = View.VISIBLE
-            currentTrackTime.text = "00:00"
+            currentTrackTime.text = getString(R.string.start_time)
         }
     }
 
@@ -127,11 +122,11 @@ class AudioplayerActivity : AppCompatActivity() {
         playButton.visibility = View.GONE
         pauseButton.visibility = View.VISIBLE
         playerState = STATE_PLAYING
-        mainThreadHandler?.post(timer)
+        mainThreadHandler?.post(timerRunnable)
     }
 
     private fun pausePlayer() {
-        mainThreadHandler?.removeCallbacks(timer)
+        mainThreadHandler?.removeCallbacks(timerRunnable)
         mediaPlayer.pause()
         pauseButton.visibility = View.GONE
         playButton.visibility = View.VISIBLE
@@ -155,15 +150,16 @@ class AudioplayerActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         mediaPlayer.release()
-        mainThreadHandler?.removeCallbacks(timer)
+        mainThreadHandler?.removeCallbacks(timerRunnable)
+        mainThreadHandler = null
+        super.onDestroy()
     }
     companion object {
         private const val STATE_DEFAULT = 0
         private const val STATE_PREPARED = 1
         private const val STATE_PLAYING = 2
         private const val STATE_PAUSED = 3
-        private const val DELAY = 300L
+        private const val DELAY_MILLIS = 300L
     }
 }

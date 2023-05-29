@@ -166,7 +166,7 @@ class SearchActivity : AppCompatActivity() {
     private val searchRunnable = Runnable { search() }
     private fun searchDebounce() {
         mainThreadHandler?.removeCallbacks(searchRunnable)
-        mainThreadHandler?.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+        mainThreadHandler?.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY_MILLIS)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -250,7 +250,7 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            mainThreadHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            mainThreadHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MILLIS)
         }
         return current
     }
@@ -279,12 +279,18 @@ class SearchActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+
+    override fun onDestroy() {
+        mainThreadHandler?.removeCallbacks(searchRunnable)
+        mainThreadHandler = null
+        super.onDestroy()
+    }
     companion object {
         const val ENTERED_TEXT = "ENTERED_TEXT"
         const val SEARCHED_TRACK_SIZE = 10
         const val NEW_TRACK_KEY = "newTrackKey"
         const val TRACK_LIST_KEY = "trackListKey"
-        private const val SEARCH_DEBOUNCE_DELAY = 2000L
-        private const val CLICK_DEBOUNCE_DELAY = 1000L
+        private const val SEARCH_DEBOUNCE_DELAY_MILLIS = 2000L
+        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
     }
 }
