@@ -13,7 +13,7 @@ class SearchedTrackAdapter(val clickListener: TrackAdapter.TrackClickListener) :
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener { clickListener.onTrackClick(tracks.get(position))}
-        }
+    }
 
     override fun getItemCount(): Int {
         return tracks.size

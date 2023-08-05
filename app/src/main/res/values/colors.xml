@@ -18,4 +18,5 @@
     <color name="buttons_add_and_like">#401A1B22</color>
     <color name="track_information">#1A1B22</color>
     <color name="player_buttons">#401A1B22</color>
+    <color name="progress_bar">#6200EE</color>
 </resources>
