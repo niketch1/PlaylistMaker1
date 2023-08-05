@@ -2,6 +2,8 @@ package com.example.playlistmaker1
 
 import android.content.SharedPreferences
 import com.example.playlistmaker1.SearchActivity.Companion.TRACK_LIST_KEY
+import com.example.playlistmaker1.data.dto.TrackDto
+import com.example.playlistmaker1.domain.models.Track
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -28,7 +30,7 @@ class SearchHistory(val sharedPrefs : SharedPreferences?){
         return Gson().fromJson(json, itemType)
     }
 
-    private fun createTrackFromJson(json: String?): Track{
+    private fun createTrackFromJson(json: String?): Track {
         return Gson().fromJson(json, Track::class.java)
     }
 }

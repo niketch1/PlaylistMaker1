@@ -3,6 +3,8 @@ package com.example.playlistmaker1
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker1.data.dto.TrackDto
+import com.example.playlistmaker1.domain.models.Track
 
 class TrackAdapter(val clickListener: TrackClickListener): RecyclerView.Adapter<TrackViewHolder> () {
 
@@ -22,7 +24,7 @@ class TrackAdapter(val clickListener: TrackClickListener): RecyclerView.Adapter<
         fun onTrackClick(track: Track)
     }
 
-    fun setTracks(newTracks: List<Track>?) {
+    fun setTracks(newTracks: ArrayList<Track>?) {
         tracks.clear()
         if (!newTracks.isNullOrEmpty()) {
             tracks.addAll(newTracks)

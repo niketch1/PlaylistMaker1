@@ -1,6 +1,5 @@
-package com.example.playlistmaker1
+package com.example.playlistmaker1.presentation
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -11,30 +10,31 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.google.gson.Gson
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-
+import com.example.playlistmaker1.Creator
+import com.example.playlistmaker1.PLAYLIST_PREFERENCES
+import com.example.playlistmaker1.R
+import com.example.playlistmaker1.SearchActivity
+import com.example.playlistmaker1.domain.models.AudioplayerState
+import com.example.playlistmaker1.presentation.mapper.DateFormatUtil
+import com.example.playlistmaker1.presentation.mapper.TrackFromJson
 
 
 class AudioplayerActivity : AppCompatActivity() {
 
-    private var dateFormatUtil = DateFormatUtil()
-    private var mediaPlayer = MediaPlayer()
+    private val dateFormatUtil = DateFormatUtil()
+    private val trackFromJson = TrackFromJson()
     private lateinit var url : String
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
-    val timerRunnable = getCurrentTime()
     private var mainThreadHandler: Handler? = null
-
+    private val audioplayerInteractor = Creator.provideAudioplayerInteractor()
+    var audioplayerState = AudioplayerState.STATE_DEFAULT
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_audioplayer)
 
         mainThreadHandler = Handler(Looper.getMainLooper())
-
 
         val back = findViewById<ImageButton>(R.id.buttonBack)
 
@@ -55,11 +55,11 @@ class AudioplayerActivity : AppCompatActivity() {
         currentTrackTime.text = getString(R.string.start_time)
         playButton = findViewById(R.id.playButton)
         pauseButton = findViewById(R.id.pauseButton)
-        val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
 
+        val sharedPreferences = getSharedPreferences(PLAYLIST_PREFERENCES, MODE_PRIVATE)
         val pressedTrack = sharedPreferences?.getString(SearchActivity.NEW_TRACK_KEY, null)
         if (pressedTrack != null){
-            val convertedTrack = createTrackFromJson(pressedTrack)
+            val convertedTrack = trackFromJson.createTrackFromJson(pressedTrack)
             Glide.with(this)
                 .load(convertedTrack.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg"))
                 .centerCrop()
@@ -78,7 +78,19 @@ class AudioplayerActivity : AppCompatActivity() {
             trackGenre.text = convertedTrack.primaryGenreName
             trackCountry.text = convertedTrack.country
 
-            preparePlayer()
+            audioplayerInteractor.preparePlayer(url,
+                onPreparedCallback = {
+                audioplayerState = AudioplayerState.STATE_PREPARED
+                },
+                onCompletionCallback = {
+                    mainThreadHandler?.removeCallbacks(getCurrentTime())
+                    audioplayerState = AudioplayerState.STATE_PREPARED
+                    pauseButton.visibility = View.GONE;
+                    playButton.visibility = View.VISIBLE;
+                    currentTrackTime.text = getString(R.string.start_time)
+                }
+            )
+
             playButton.setOnClickListener {
                 playbackControl()
             }
@@ -87,59 +99,44 @@ class AudioplayerActivity : AppCompatActivity() {
             }
         }
     }
-    private fun getCurrentTime() : Runnable {
+    private fun getCurrentTime(): Runnable {
         return object : Runnable {
             override fun run() {
-                currentTrackTime.text = dateFormatUtil.convertIntTimeToString(mediaPlayer.currentPosition)
-                mainThreadHandler?.postDelayed(this, DELAY_MILLIS)
+                if (audioplayerState == AudioplayerState.STATE_PLAYING) {
+                    currentTrackTime.text = audioplayerInteractor.transferCurrentTime()
+                    mainThreadHandler?.postDelayed(this, DELAY_MILLIS_Activity)
+                }
             }
-        }
-    }
-
-    private fun createTrackFromJson(json: String?): Track{
-        return Gson().fromJson(json, Track::class.java)
-    }
-
-    private var playerState = STATE_DEFAULT
-
-    private fun preparePlayer() {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            mainThreadHandler?.removeCallbacks(timerRunnable)
-            playerState = STATE_PREPARED
-            pauseButton.visibility = View.GONE
-            playButton.visibility = View.VISIBLE
-            currentTrackTime.text = getString(R.string.start_time)
         }
     }
 
     private fun startPlayer() {
-        mediaPlayer.start()
+        audioplayerState = AudioplayerState.STATE_PLAYING
+        mainThreadHandler?.post(getCurrentTime())
+        audioplayerInteractor.startPlayer()
         playButton.visibility = View.GONE
         pauseButton.visibility = View.VISIBLE
-        playerState = STATE_PLAYING
-        mainThreadHandler?.post(timerRunnable)
     }
 
     private fun pausePlayer() {
-        mainThreadHandler?.removeCallbacks(timerRunnable)
-        mediaPlayer.pause()
+        if(audioplayerState == AudioplayerState.STATE_PLAYING) {
+            audioplayerInteractor.pausePlayer()
+        }
+        audioplayerState = AudioplayerState.STATE_PAUSED
         pauseButton.visibility = View.GONE
         playButton.visibility = View.VISIBLE
-        playerState = STATE_PAUSED
+        mainThreadHandler?.removeCallbacks(getCurrentTime())
     }
 
     private fun playbackControl() {
-        when(playerState) {
-            STATE_PLAYING -> {
+        when(audioplayerState) {
+            AudioplayerState.STATE_PLAYING -> {
                 pausePlayer()
             }
-            STATE_PREPARED, STATE_PAUSED -> {
+            AudioplayerState.STATE_PREPARED, AudioplayerState.STATE_PAUSED -> {
                 startPlayer()
+            }
+            AudioplayerState.STATE_DEFAULT -> {
             }
         }
     }
@@ -150,16 +147,13 @@ class AudioplayerActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        mediaPlayer.release()
-        mainThreadHandler?.removeCallbacks(timerRunnable)
+        mainThreadHandler?.removeCallbacks(getCurrentTime())
         mainThreadHandler = null
+        audioplayerInteractor.onDestroy()
         super.onDestroy()
     }
+
     companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
-        private const val DELAY_MILLIS = 300L
+        const val DELAY_MILLIS_Activity = 300L
     }
 }

@@ -3,6 +3,8 @@ package com.example.playlistmaker1
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker1.data.dto.TrackDto
+import com.example.playlistmaker1.domain.models.Track
 import com.google.gson.Gson
 
 class SearchedTrackAdapter(val clickListener: TrackAdapter.TrackClickListener) : RecyclerView.Adapter<TrackViewHolder> () {
