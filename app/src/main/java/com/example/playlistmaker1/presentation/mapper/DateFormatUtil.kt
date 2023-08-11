@@ -1,4 +1,4 @@
-package com.example.playlistmaker1
+package com.example.playlistmaker1.presentation.mapper
 
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -7,10 +7,6 @@ import java.util.Locale
 class DateFormatUtil {
 
     fun convertLongTimeToString(timeMillis : Long) : String{
-        return SimpleDateFormat("mm:ss", Locale.getDefault()).format(timeMillis)
-    }
-
-    fun convertIntTimeToString(timeMillis : Int) : String{
         return SimpleDateFormat("mm:ss", Locale.getDefault()).format(timeMillis)
     }
 
