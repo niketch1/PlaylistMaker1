@@ -23,7 +23,7 @@ class AudioplayerActivity : AppCompatActivity() {
 
     private val dateFormatUtil = DateFormatUtil()
     private val trackFromJson = TrackFromJson()
-    private lateinit var url : String
+    private var url : String? = null
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
@@ -78,7 +78,7 @@ class AudioplayerActivity : AppCompatActivity() {
             trackGenre.text = convertedTrack.primaryGenreName
             trackCountry.text = convertedTrack.country
 
-            audioplayerInteractor.preparePlayer(url,
+            audioplayerInteractor.preparePlayer(url!!,
                 onPreparedCallback = {
                 audioplayerState = AudioplayerState.STATE_PREPARED
                 },

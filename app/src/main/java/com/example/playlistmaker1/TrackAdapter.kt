@@ -24,7 +24,7 @@ class TrackAdapter(val clickListener: TrackClickListener): RecyclerView.Adapter<
         fun onTrackClick(track: Track)
     }
 
-    fun setTracks(newTracks: ArrayList<Track>?) {
+    fun setTracks(newTracks: List<Track>?) {
         tracks.clear()
         if (!newTracks.isNullOrEmpty()) {
             tracks.addAll(newTracks)
