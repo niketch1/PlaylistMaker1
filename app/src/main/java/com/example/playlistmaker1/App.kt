@@ -13,9 +13,10 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        context = this
 
         val sharedPrefs = getSharedPreferences(THEME_PREFERENCES, MODE_PRIVATE)
-        darkTheme = sharedPrefs.getBoolean(EDIT_BOOLEAN_KEY, darkThemeCheck(this))
+        darkTheme = sharedPrefs.getBoolean(EDIT_BOOLEAN_KEY, darkThemeCheck())
         switchTheme(darkTheme)
     }
 
@@ -30,14 +31,18 @@ class App : Application() {
         )
     }
 
-    fun darkThemeCheck(context: Context):Boolean{
+    fun darkThemeCheck():Boolean{
 
         var isNight = false
-        val currentNightMode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        val currentNightMode = context?.resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
         isNight = when ((currentNightMode)) {
             Configuration.UI_MODE_NIGHT_YES -> true
             else -> false
         }
         return isNight
+    }
+
+    companion object {
+        var context: Context? = null
     }
 }
