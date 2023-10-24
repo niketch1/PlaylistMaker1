@@ -33,7 +33,7 @@ val dataModule = module {
 
     single{ DataTimeFormatUtil()}
 
-    single{MediaPlayer()}
+    factory{MediaPlayer()}
 
     single {
         SearchHistory(get())

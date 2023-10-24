@@ -24,7 +24,7 @@ val repositoryModule = module {
         ExternalNavigatorImpl()
     }
 
-    single<AudioplayerRepository>{
+    factory<AudioplayerRepository>{
         AudioplayerRepositoryImpl(get(), get())
     }
 }

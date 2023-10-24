@@ -24,7 +24,7 @@ val interactorModule = module {
         SharingInteractorImpl(get())
     }
 
-    single<AudioplayerInteractor> {
+    factory<AudioplayerInteractor> {
         AudioplayerInteractorImpl(get())
     }
 }
