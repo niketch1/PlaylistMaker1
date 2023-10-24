@@ -9,16 +9,9 @@ import com.example.playlistmaker1.search.data.dto.TracksSearchRequest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class RetrofitNetworkClient (private val context : Context) : NetworkClient{
-
-    private val iTunesBaseUrl = "http://itunes.apple.com"
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(iTunesBaseUrl)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    private val ITunesService = retrofit.create(iTunesSearchAPI::class.java)
+class RetrofitNetworkClient (
+    private val iTunesService: iTunesSearchAPI,
+    private val context : Context) : NetworkClient{
 
     override fun doRequest(dto: Any): Response {
         if(isConnected() == false){
@@ -28,7 +21,7 @@ class RetrofitNetworkClient (private val context : Context) : NetworkClient{
             return Response().apply{resultCode = 400}
         }
 
-        val response = ITunesService.search(dto.text).execute()
+        val response = iTunesService.search(dto.text).execute()
         val body = response.body()
         return if(body != null) {
             body.apply { resultCode = response.code() }

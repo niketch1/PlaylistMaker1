@@ -1,7 +1,6 @@
 package com.example.playlistmaker1.search.ui.activity
 
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -10,7 +9,6 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.*
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker1.R
@@ -20,6 +18,7 @@ import com.example.playlistmaker1.player.ui.activity.AudioplayerActivity
 import com.example.playlistmaker1.search.domain.model.Track
 import com.example.playlistmaker1.search.ui.model.TracksState
 import com.example.playlistmaker1.search.ui.view_model.TracksSearchViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 const val PLAYLIST_PREFERENCES = "playlistPreferences"
 
@@ -27,6 +26,7 @@ const val PLAYLIST_PREFERENCES = "playlistPreferences"
 class SearchActivity : AppCompatActivity() {
 
     private var mainThreadHandler: Handler? = null
+    private val viewModel: TracksSearchViewModel by viewModel()
 
     private val searchedTrackAdapter = SearchedTrackAdapter{
         showSearched(it)
@@ -44,17 +44,10 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var buttonRefresh: Button
     private lateinit var buttonClearStory: Button
     private lateinit var youSearched: TextView
-    private lateinit var viewModel: TracksSearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
-
-
-        viewModel = ViewModelProvider(
-            this,
-            TracksSearchViewModel.getViewModelFactory()
-        )[TracksSearchViewModel::class.java]
 
         inputEditText = findViewById(R.id.inputEditText)
         inputEditText.setText(viewModel.getLatestSearchText() ?: "")
@@ -87,9 +80,7 @@ class SearchActivity : AppCompatActivity() {
         buttonClearStory.setOnClickListener {
             searchedTrackAdapter.setTracks(null)
             viewModel.editSavedTrackList(null)
-            youSearched.visibility = View.GONE
-            recyclerViewYouSearched.visibility = View.GONE
-            buttonClearStory.visibility = View.GONE
+            hideYouSearchedVisibility()
         }
 
         val back = findViewById<FrameLayout>(R.id.buttonBack)
@@ -110,18 +101,12 @@ class SearchActivity : AppCompatActivity() {
             if (hasFocus && inputEditText.text.isEmpty()) {
                 trackAdapter.setTracks(null)
                 if (searchedTrackAdapter.isSearchedTrackListEmpty()) {
-                    youSearched.visibility = View.GONE
-                    recyclerViewYouSearched.visibility = View.GONE
-                    buttonClearStory.visibility = View.GONE
+                    hideYouSearchedVisibility()
                 } else {
-                    youSearched.visibility = View.VISIBLE
-                    recyclerViewYouSearched.visibility = View.VISIBLE
-                    buttonClearStory.visibility = View.VISIBLE
+                    seeYouSearchedVisibility()
                 }
             } else {
-                youSearched.visibility = View.GONE
-                recyclerViewYouSearched.visibility = View.GONE
-                buttonClearStory.visibility = View.GONE
+                hideYouSearchedVisibility()
             }
         }
 
@@ -134,18 +119,12 @@ class SearchActivity : AppCompatActivity() {
                 if (inputEditText.hasFocus() && s?.isEmpty() == true) {
                     trackAdapter.setTracks(null)
                     if (searchedTrackAdapter.isSearchedTrackListEmpty()) {
-                        youSearched.visibility = View.GONE
-                        recyclerViewYouSearched.visibility = View.GONE
-                        buttonClearStory.visibility = View.GONE
+                        hideYouSearchedVisibility()
                     } else {
-                        youSearched.visibility = View.VISIBLE
-                        recyclerViewYouSearched.visibility = View.VISIBLE
-                        buttonClearStory.visibility = View.VISIBLE
+                        seeYouSearchedVisibility()
                     }
                 } else {
-                    youSearched.visibility = View.GONE
-                    recyclerViewYouSearched.visibility = View.GONE
-                    buttonClearStory.visibility = View.GONE
+                    hideYouSearchedVisibility()
                 }
                 clearButton.visibility = clearButtonVisibility(s)
             }
@@ -155,6 +134,18 @@ class SearchActivity : AppCompatActivity() {
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
 
+    }
+
+    private fun hideYouSearchedVisibility(){
+        youSearched.visibility = View.GONE
+        recyclerViewYouSearched.visibility = View.GONE
+        buttonClearStory.visibility = View.GONE
+    }
+
+    private fun seeYouSearchedVisibility(){
+        youSearched.visibility = View.VISIBLE
+        recyclerViewYouSearched.visibility = View.VISIBLE
+        buttonClearStory.visibility = View.VISIBLE
     }
 
     private fun render(state: TracksState) {

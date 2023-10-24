@@ -6,7 +6,6 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker1.R
@@ -14,6 +13,7 @@ import com.example.playlistmaker1.player.ui.DateFormatUtil
 import com.example.playlistmaker1.player.ui.PlayStatus
 import com.example.playlistmaker1.player.ui.view_model.AudioPlayerViewModel
 import com.example.playlistmaker1.search.domain.model.Track
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class AudioplayerActivity : AppCompatActivity() {
@@ -22,7 +22,7 @@ class AudioplayerActivity : AppCompatActivity() {
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
-    private lateinit var viewModel: AudioPlayerViewModel
+    private val viewModel: AudioPlayerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +56,7 @@ class AudioplayerActivity : AppCompatActivity() {
             .transform(RoundedCorners(this.resources.getDimensionPixelSize(R.dimen.track_image_radius)))
             .into(trackImage)
 
-        viewModel = ViewModelProvider(this, AudioPlayerViewModel.getViewModelFactory(convertedTrack))[AudioPlayerViewModel::class.java]
+        viewModel.preparePlayer(convertedTrack)
         trackName.text = convertedTrack.trackName
         artistName.text = convertedTrack.artistName
         trackTime.text = dateFormatUtil.convertLongTimeToString(convertedTrack.trackTimeMillis)
@@ -82,8 +82,8 @@ class AudioplayerActivity : AppCompatActivity() {
 
     private fun changeButtonStyle(playStatus: PlayStatus) {
         if(playStatus.completed){
-            pauseButton.visibility = View.GONE;
-            playButton.visibility = View.VISIBLE;
+            pauseButton.visibility = View.GONE
+            playButton.visibility = View.VISIBLE
             currentTrackTime.text = getString(R.string.start_time)
         }
         if(playStatus.isPlaying){

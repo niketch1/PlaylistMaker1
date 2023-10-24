@@ -2,6 +2,7 @@ package com.example.playlistmaker1.search.data
 
 import com.example.playlistmaker1.creator.Resource
 import com.example.playlistmaker1.search.data.dto.ITunesResponse
+import com.example.playlistmaker1.search.data.dto.TrackDto
 import com.example.playlistmaker1.search.data.dto.TracksSearchRequest
 import com.example.playlistmaker1.search.domain.model.Track
 
@@ -17,18 +18,7 @@ class TracksRepositoryImpl(
                 Resource.Error("Проверьте подключение к интернету")
             }
             200 ->{
-                Resource.Success((response as ITunesResponse).results.map{
-                    Track(
-                        trackName = it.trackName,
-                        artistName = it.artistName,
-                        trackTimeMillis = it.trackTimeMillis,
-                        artworkUrl100 = it.artworkUrl100,
-                        trackId = it.trackId,
-                        collectionName = it.collectionName,
-                        releaseDate = it.releaseDate,
-                        primaryGenreName = it.primaryGenreName,
-                        country = it.country,
-                        previewUrl = it.previewUrl)})
+                Resource.Success((response as ITunesResponse).results.map{it.mapToDomain()})
             }
             else -> {
                 Resource.Error(response.resultCode.toString())
@@ -47,4 +37,21 @@ class TracksRepositoryImpl(
     override fun clearTrackListFromHistory() {
         searchHistory.clearHistory()
     }
+
+    private fun TrackDto.mapToDomain(): Track {
+        return Track(
+            trackName = trackName,
+            artistName = artistName,
+            trackTimeMillis = trackTimeMillis,
+            artworkUrl100 = artworkUrl100,
+            trackId = trackId,
+            collectionName = collectionName,
+            releaseDate = releaseDate,
+            primaryGenreName = primaryGenreName,
+            country = country,
+            previewUrl = previewUrl
+        )
+    }
 }
+
+

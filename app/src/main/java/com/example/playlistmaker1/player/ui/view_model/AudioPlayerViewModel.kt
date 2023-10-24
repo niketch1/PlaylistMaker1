@@ -5,33 +5,38 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.playlistmaker1.creator.Creator
 import com.example.playlistmaker1.player.domain.api.AudioplayerInteractor
 import com.example.playlistmaker1.player.ui.PlayStatus
 import com.example.playlistmaker1.search.domain.model.Track
 
 class AudioPlayerViewModel(
     private val audioplayerInteractor: AudioplayerInteractor,
-    private val track : Track,
 ) : ViewModel(){
 
     private var playStatusLiveData = MutableLiveData<PlayStatus>()
     private val handler = Handler(Looper.getMainLooper())
 
-    init{
+    fun preparePlayer(convertedTrack: Track) {
         audioplayerInteractor.preparePlayer(
-            url = track.previewUrl,
+            url = convertedTrack.previewUrl,
             onPreparedCallback = {
                 playStatusLiveData.postValue(
-                    PlayStatus(progress = "00:00", isPlaying = false, prepared = true, completed = false)
+                    PlayStatus(
+                        progress = "00:00",
+                        isPlaying = false,
+                        prepared = true,
+                        completed = false
+                    )
                 )
             },
             onCompletionCallback = {
                 playStatusLiveData.postValue(
-                    PlayStatus(progress = "00:00", isPlaying = false, prepared = true, completed = true)
+                    PlayStatus(
+                        progress = "00:00",
+                        isPlaying = false,
+                        prepared = true,
+                        completed = true
+                    )
                 )
             }
         )
@@ -80,16 +85,6 @@ class AudioPlayerViewModel(
 
     companion object {
         const val DELAY_MILLIS_Activity = 300L
-        fun getViewModelFactory(track: Track): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val interactor = Creator.provideAudioplayerInteractor()
-
-                AudioPlayerViewModel(
-                    interactor,
-                    track,
-                )
-            }
-        }
     }
 
 }

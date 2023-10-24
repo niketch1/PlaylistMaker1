@@ -5,23 +5,22 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.lifecycle.ViewModelProvider
 import com.example.playlistmaker1.App
 import com.example.playlistmaker1.R
 import com.example.playlistmaker1.settings.ui.view_model.SettingsViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class SettingsActivity() : AppCompatActivity() {
 
-    private lateinit var viewModel: SettingsViewModel
+    private val viewModel: SettingsViewModel by viewModel()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        viewModel = ViewModelProvider(this, SettingsViewModel.getViewModelFactory())[SettingsViewModel::class.java]
         val back = findViewById<FrameLayout>(R.id.buttonBack)
 
         back.setOnClickListener {
@@ -50,7 +49,7 @@ class SettingsActivity() : AppCompatActivity() {
         themeSwitcher.setChecked(viewModel.getTheme())
         themeSwitcher.setOnCheckedChangeListener { switcher, checked ->
             viewModel.changeTheme(checked)
-            App.context = this
+            App.appContext= this
         }
     }
 }
