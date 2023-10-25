@@ -20,9 +20,6 @@ import com.example.playlistmaker1.search.ui.model.TracksState
 import com.example.playlistmaker1.search.ui.view_model.TracksSearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-const val PLAYLIST_PREFERENCES = "playlistPreferences"
-
-
 class SearchActivity : AppCompatActivity() {
 
     private var mainThreadHandler: Handler? = null
@@ -159,9 +156,13 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showLoading(){
         progressBar.visibility = View.VISIBLE
+        placeholderMessage.visibility = View.GONE
+        placeholderIcon.visibility = View.GONE
+        buttonRefresh.visibility = View.GONE
     }
 
     private fun showContent(tracks: List<Track>){
+        recyclerView.visibility = View.VISIBLE
         progressBar.visibility = View.GONE
         placeholderMessage.visibility = View.GONE
         placeholderIcon.visibility = View.GONE
@@ -171,6 +172,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showError(errorMessage: String){
+        recyclerView.visibility = View.GONE
         progressBar.visibility = View.GONE
         placeholderMessage.visibility = View.VISIBLE
         placeholderIcon.visibility = View.VISIBLE
@@ -184,6 +186,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showEmpty(message: String){
+        recyclerView.visibility = View.GONE
         progressBar.visibility = View.GONE
         placeholderMessage.visibility = View.VISIBLE
         placeholderIcon.visibility = View.VISIBLE
@@ -231,5 +234,6 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCHED_TRACK_SIZE = 10
         const val TRACK_LIST_KEY = "trackListKey"
         private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+        const val PLAYLIST_PREFERENCES = "playlistPreferences"
     }
 }

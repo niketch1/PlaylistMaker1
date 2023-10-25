@@ -18,5 +18,8 @@
     <color name="buttons_add_and_like">#401A1B22</color>
     <color name="track_information">#FFFFFFFF</color>
     <color name="player_buttons">#40FFFFFF</color>
-    <color name="progress_bar">#6200EE</color>
+    <color name="progress_bar">#3772E7</color>
+    <color name="cursor">#3772E7</color>
+    <color name="switcher_thumb">#3772E7</color>
+    <color name="switcher_track">#9FBBF3</color>
 </resources>

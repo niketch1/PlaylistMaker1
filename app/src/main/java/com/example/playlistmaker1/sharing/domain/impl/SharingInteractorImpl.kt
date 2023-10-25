@@ -2,7 +2,7 @@ package com.example.playlistmaker1.sharing.domain.impl
 
 import com.example.playlistmaker1.App
 import com.example.playlistmaker1.R
-import com.example.playlistmaker1.sharing.data.ExternalNavigator
+import com.example.playlistmaker1.sharing.domain.api.ExternalNavigator
 import com.example.playlistmaker1.sharing.domain.model.EmailData
 import com.example.playlistmaker1.sharing.domain.api.SharingInteractor
 

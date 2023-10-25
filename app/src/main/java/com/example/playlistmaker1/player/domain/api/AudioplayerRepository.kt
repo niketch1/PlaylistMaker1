@@ -1,4 +1,4 @@
-package com.example.playlistmaker1.player.data
+package com.example.playlistmaker1.player.domain.api
 
 interface AudioplayerRepository {
 

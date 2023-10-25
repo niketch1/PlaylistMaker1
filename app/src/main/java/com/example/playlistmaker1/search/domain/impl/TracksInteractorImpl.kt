@@ -2,7 +2,7 @@ package com.example.playlistmaker1.search.domain.impl
 
 
 import com.example.playlistmaker1.creator.Resource
-import com.example.playlistmaker1.search.data.TracksRepository
+import com.example.playlistmaker1.search.domain.api.TracksRepository
 import com.example.playlistmaker1.search.domain.api.TracksInteractor
 import java.util.concurrent.Executors
 

@@ -60,7 +60,8 @@
             android:textSize="@dimen/track_text_size"
             android:fontFamily="@font/ys_display_regular"
             android:imeOptions="actionDone"
-            android:singleLine="true"/> />
+            android:singleLine="true"
+            android:textCursorDrawable="@drawable/cursor"/>
 
         <ImageView
             android:id="@+id/clearIcon"
@@ -105,7 +106,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_gravity="center|top"
-            android:layout_marginTop="105dp">
+            android:layout_marginTop="105dp"
+            >
 
             <ImageView
                 android:id="@+id/placeholderIcon"
@@ -167,6 +169,7 @@
                 style="@style/RefreshButtonStyle"
                 android:text="@string/clearStory"
                 android:layout_gravity="center"
+                android:layout_marginTop="24dp"
                 android:visibility="gone"/>
         </LinearLayout>
     </FrameLayout>

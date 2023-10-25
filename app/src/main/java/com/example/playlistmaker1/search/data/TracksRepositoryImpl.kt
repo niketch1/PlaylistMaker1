@@ -4,12 +4,13 @@ import com.example.playlistmaker1.creator.Resource
 import com.example.playlistmaker1.search.data.dto.ITunesResponse
 import com.example.playlistmaker1.search.data.dto.TrackDto
 import com.example.playlistmaker1.search.data.dto.TracksSearchRequest
+import com.example.playlistmaker1.search.domain.api.TracksRepository
 import com.example.playlistmaker1.search.domain.model.Track
 
 class TracksRepositoryImpl(
     private val networkClient : NetworkClient,
     private val searchHistory: SearchHistory,
-) : TracksRepository{
+) : TracksRepository {
 
     override fun searchTracks(text: String): Resource<List<Track>> {
         val response = networkClient.doRequest(TracksSearchRequest(text))
