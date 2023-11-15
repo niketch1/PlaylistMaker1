@@ -7,12 +7,7 @@ import android.os.SystemClock
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.playlistmaker1.R
-import com.example.playlistmaker1.creator.Creator
 import com.example.playlistmaker1.search.domain.api.TracksInteractor
 import com.example.playlistmaker1.search.domain.model.Track
 import com.example.playlistmaker1.search.ui.model.SingleLiveEvent
@@ -29,20 +24,13 @@ class TracksSearchViewModel(
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private val SEARCH_REQUEST_TOKEN = Any()
-
-        fun getViewModelFactory(): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val interactor = Creator.provideTracksInteractor(this[APPLICATION_KEY] as Application)
-                TracksSearchViewModel(this[APPLICATION_KEY] as Application,interactor)
-            }
-        }
     }
     val presavedTracks : MutableList<Track> = mutableListOf()
     private val itemType = object : TypeToken<ArrayList<Track>>() {}.type
 
     init {
         val savedTracks = tracksInteractor.getSavedTracks()
-        if (savedTracks != null) {
+        savedTracks?.let {
             presavedTracks.addAll(createTrackListFromJson(savedTracks))
         }
     }
@@ -89,7 +77,7 @@ class TracksSearchViewModel(
                                     errorMessage = getApplication<Application>().getString(R.string.something_went_wrong)
                                 )
                             )
-                            showToast.postValue(errorMessage)
+                            showToast.postValue(errorMessage!!)
                         }
 
                         tracks.isEmpty() -> {

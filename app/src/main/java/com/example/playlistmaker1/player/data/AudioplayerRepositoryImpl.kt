@@ -1,11 +1,11 @@
 package com.example.playlistmaker1.player.data
 
 import android.media.MediaPlayer
+import com.example.playlistmaker1.player.domain.api.AudioplayerRepository
 
-class AudioplayerRepositoryImpl : AudioplayerRepository {
-
-    private var dataTimeFormatUtil = DataTimeFormatUtil()
-    private val mediaPlayer = MediaPlayer()
+class AudioplayerRepositoryImpl(
+    private val dataTimeFormatUtil: DataTimeFormatUtil,
+    private val mediaPlayer: MediaPlayer) : AudioplayerRepository {
 
     override fun preparePlayer(url : String, onPreparedCallback: () -> Unit, onCompletionCallback: () -> Unit) {
         mediaPlayer.setDataSource(url)

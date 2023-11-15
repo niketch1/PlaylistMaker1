@@ -51,6 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
             android:layout_marginEnd="6dp"
+            app:thumbTint="@color/switcher_thumb"
+            app:trackTint="@color/switcher_track"
             tools:ignore="UseSwitchCompatOrMaterialXml" />
     </FrameLayout>
 
