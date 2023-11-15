@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.playlistmaker1.R
-import com.example.playlistmaker1.databinding.FragmentFavoritesBinding
 import com.example.playlistmaker1.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker1.media.ui.view_model.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel

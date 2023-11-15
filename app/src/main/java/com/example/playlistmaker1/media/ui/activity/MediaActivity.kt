@@ -2,7 +2,6 @@ package com.example.playlistmaker1.media.ui.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.FrameLayout
 import com.example.playlistmaker1.R
 import com.example.playlistmaker1.databinding.ActivityMediaBinding
 import com.example.playlistmaker1.media.ui.fragments.ViewPagerAdapter

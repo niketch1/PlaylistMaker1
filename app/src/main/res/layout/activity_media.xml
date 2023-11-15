@@ -40,13 +40,12 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/tab_background"
         app:tabTextAppearance="@style/TabsStyle"
         app:tabTextColor="@color/tab_text"
-        app:tabIndicatorColor="@color/purple_200"
-        app:tabIndicatorHeight="2dp"
+        app:tabIndicator="@drawable/tab_indicator"
         app:tabMode="fixed"
-        app:tabIndicatorFullWidth="true"/>
+        app:tabIndicatorColor="@color/media"
+/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
