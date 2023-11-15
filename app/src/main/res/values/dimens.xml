@@ -22,4 +22,5 @@
     <dimen name="track_information_gap">17dp</dimen>
     <dimen name="track_image_radius">8dp</dimen>
     <dimen name="max_track_info">264dp</dimen>
+    <dimen name="tabs_text">14dp</dimen>
 </resources>
