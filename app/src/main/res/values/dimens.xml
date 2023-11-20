@@ -23,4 +23,9 @@
     <dimen name="track_image_radius">8dp</dimen>
     <dimen name="max_track_info">264dp</dimen>
     <dimen name="tabs_text">14dp</dimen>
+    <dimen name="margin_start_image_button_back">4dp</dimen>
+    <dimen name="margin_start_text_button_back">60dp</dimen>
+    <dimen name="margin_top_text_button_back">10dp</dimen>
+    <dimen name="margin_bottom_text_button_back">12dp</dimen>
+    <dimen name="margin_end_text_button_back">16dp</dimen>
 </resources>

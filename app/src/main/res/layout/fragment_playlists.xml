@@ -7,6 +7,7 @@
     <Button
         android:id="@+id/newPlaylist"
         android:foreground="?attr/selectableItemBackground"
+        android:background="@null"
         style="@style/RefreshButtonStyle"
         android:text="@string/new_playlist"
         android:layout_gravity="center"

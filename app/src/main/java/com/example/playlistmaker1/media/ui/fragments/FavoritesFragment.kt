@@ -14,17 +14,17 @@ import org.koin.core.parameter.parametersOf
 class FavoritesFragment : Fragment() {
 
     companion object {
-        private const val FAVORITES_TRACK_ADAPTER = "favorites_track_adapter"
+        private const val FAVORITES_TRACK_DATA = "favorites_track_adapter"
 
         fun newInstance(favoritesTrackAdapter: String) = FavoritesFragment().apply {
             arguments = Bundle().apply {
-                putString(FAVORITES_TRACK_ADAPTER, favoritesTrackAdapter)
+                putString(FAVORITES_TRACK_DATA, favoritesTrackAdapter)
             }
         }
     }
 
     private val favoritesViewModel: FavoritesViewModel by viewModel {
-        parametersOf(requireArguments().getString(FAVORITES_TRACK_ADAPTER))
+        parametersOf(requireArguments().getString(FAVORITES_TRACK_DATA))
     }
 
     private lateinit var binding: FragmentFavoritesBinding
