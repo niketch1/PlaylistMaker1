@@ -4,7 +4,7 @@ package com.example.playlistmaker1.search.ui.recycler_view
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker1.search.domain.model.Track
-import com.example.playlistmaker1.search.ui.activity.SearchActivity
+import com.example.playlistmaker1.search.ui.fragment.SearchFragment
 import com.google.gson.Gson
 
 class SearchedTrackAdapter(val clickListener: TrackAdapter.TrackClickListener) : RecyclerView.Adapter<TrackViewHolder> () {
@@ -46,7 +46,7 @@ class SearchedTrackAdapter(val clickListener: TrackAdapter.TrackClickListener) :
             if (!listHasBeenUpdated) {
                 tracks.add(0, newTrack)
             }
-            if(tracks.size > SearchActivity.SEARCHED_TRACK_SIZE) {
+            if(tracks.size > SearchFragment.SEARCHED_TRACK_SIZE) {
                 tracks.removeAt(tracks.size-1)
             }
             notifyDataSetChanged()

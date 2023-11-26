@@ -1,7 +1,7 @@
 package com.example.playlistmaker1.search.data
 
 import android.content.SharedPreferences
-import com.example.playlistmaker1.search.ui.activity.SearchActivity.Companion.TRACK_LIST_KEY
+import com.example.playlistmaker1.search.ui.fragment.SearchFragment.Companion.TRACK_LIST_KEY
 
 
 class SearchHistory(val sharedPrefs : SharedPreferences?){

@@ -5,6 +5,7 @@ import com.example.playlistmaker1.search.domain.model.Track
 sealed interface TracksState {
 
     object Loading : TracksState
+    object Default : TracksState
 
     data class Content(
         val tracks: List<Track>

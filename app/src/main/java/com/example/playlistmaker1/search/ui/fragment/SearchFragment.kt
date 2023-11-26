@@ -1,37 +1,47 @@
-package com.example.playlistmaker1.search.ui.activity
+package com.example.playlistmaker1.search.ui.fragment
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker1.R
-import com.example.playlistmaker1.search.ui.recycler_view.SearchedTrackAdapter
-import com.example.playlistmaker1.search.ui.recycler_view.TrackAdapter
+import com.example.playlistmaker1.databinding.FragmentSearchBinding
 import com.example.playlistmaker1.player.ui.activity.AudioplayerActivity
 import com.example.playlistmaker1.search.domain.model.Track
 import com.example.playlistmaker1.search.ui.model.TracksState
+import com.example.playlistmaker1.search.ui.recycler_view.SearchedTrackAdapter
+import com.example.playlistmaker1.search.ui.recycler_view.TrackAdapter
 import com.example.playlistmaker1.search.ui.view_model.TracksSearchViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
-    private var mainThreadHandler: Handler? = null
-    private val viewModel: TracksSearchViewModel by viewModel()
+    private val mainThreadHandler = Handler(Looper.getMainLooper())
+    private val tracksSearchViewModel by viewModel<TracksSearchViewModel>()
 
-    private val searchedTrackAdapter = SearchedTrackAdapter{
+    private val searchedTrackAdapter = SearchedTrackAdapter {
         showSearched(it)
     }
-    private val trackAdapter = TrackAdapter{
+    private val trackAdapter = TrackAdapter {
         showSearched(it)
     }
 
+    private lateinit var binding: FragmentSearchBinding
     private lateinit var progressBar: ProgressBar
     private lateinit var inputEditText: EditText
     private lateinit var recyclerView: RecyclerView
@@ -41,54 +51,62 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var buttonRefresh: Button
     private lateinit var buttonClearStory: Button
     private lateinit var youSearched: TextView
+    private lateinit var clearTextButton: ImageView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search)
 
-        inputEditText = findViewById(R.id.inputEditText)
-        inputEditText.setText(viewModel.getLatestSearchText() ?: "")
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        recyclerView = findViewById(R.id.recyclerView)
-        recyclerViewYouSearched = findViewById(R.id.recyclerViewYouSearched)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        progressBar = binding.progressBar
+        inputEditText = binding.inputEditText
+        recyclerView = binding.recyclerView
+        recyclerViewYouSearched = binding.recyclerViewYouSearched
+        placeholderMessage = binding.placeholderMessage
+        placeholderIcon = binding.placeholderIcon
+        buttonRefresh = binding.buttonRefresh
+        buttonClearStory = binding.buttonClearStory
+        youSearched = binding.youSearched
+        clearTextButton = binding.clearIcon
+
+        inputEditText.setText(tracksSearchViewModel.getLatestSearchText() ?: "")
         recyclerView.adapter = trackAdapter
-        mainThreadHandler = Handler(Looper.getMainLooper())
-        recyclerViewYouSearched.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        recyclerViewYouSearched.adapter = searchedTrackAdapter
 
-        progressBar = findViewById(R.id.progressBar)
-        placeholderMessage = findViewById(R.id.placeholderMessage)
-        placeholderIcon = findViewById(R.id.placeholderIcon)
-        buttonRefresh = findViewById(R.id.buttonRefresh)
-        buttonClearStory = findViewById(R.id.buttonClearStory)
-        youSearched = findViewById(R.id.youSearched)
+        recyclerViewYouSearched.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        recyclerViewYouSearched.adapter = searchedTrackAdapter
+        searchedTrackAdapter.setTracks(tracksSearchViewModel.getSavedTracks())
+
         youSearched.text = getString(R.string.youSearched)
 
-        searchedTrackAdapter.setTracks(viewModel.getSavedTracks())
 
-        viewModel.observeState().observe(this) {
+
+        tracksSearchViewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
+
         }
-        viewModel.observeShowToast().observe(this) { toast ->
+        tracksSearchViewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
         }
 
         buttonClearStory.setOnClickListener {
             searchedTrackAdapter.setTracks(null)
-            viewModel.editSavedTrackList(null)
+            tracksSearchViewModel.editSavedTrackList(null)
             hideYouSearchedVisibility()
         }
 
-        val back = findViewById<FrameLayout>(R.id.buttonBack)
-        back.setOnClickListener {
-            finish()
-        }
-
-        val clearButton = findViewById<ImageView>(R.id.clearIcon)
-        clearButton.setOnClickListener {
+        clearTextButton.setOnClickListener {
             inputEditText.setText("")
             trackAdapter.setTracks(null)
+            tracksSearchViewModel.renderState(TracksState.Default)
             placeholderMessage.visibility = View.GONE
             placeholderIcon.visibility = View.GONE
             buttonRefresh.visibility = View.GONE
@@ -112,7 +130,7 @@ class SearchActivity : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchDebounce(s?.toString() ?:"")
+                tracksSearchViewModel.searchDebounce(s?.toString() ?: "")
                 if (inputEditText.hasFocus() && s?.isEmpty() == true) {
                     trackAdapter.setTracks(null)
                     if (searchedTrackAdapter.isSearchedTrackListEmpty()) {
@@ -123,14 +141,13 @@ class SearchActivity : AppCompatActivity() {
                 } else {
                     hideYouSearchedVisibility()
                 }
-                clearButton.visibility = clearButtonVisibility(s)
+                clearTextButton.visibility = clearTextButtonVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {
             }
         }
         inputEditText.addTextChangedListener(simpleTextWatcher)
-
     }
 
     private fun hideYouSearchedVisibility(){
@@ -147,6 +164,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun render(state: TracksState) {
         when (state) {
+            is TracksState.Default-> showDefault()
             is TracksState.Loading -> showLoading()
             is TracksState.Content -> showContent(state.tracks)
             is TracksState.Error -> showError(state.errorMessage)
@@ -154,6 +172,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun showDefault(){}
     private fun showLoading(){
         progressBar.visibility = View.VISIBLE
         placeholderMessage.visibility = View.GONE
@@ -181,7 +200,7 @@ class SearchActivity : AppCompatActivity() {
         buttonRefresh.visibility = View.VISIBLE
 
         buttonRefresh.setOnClickListener {
-            viewModel.search(viewModel.getLatestSearchText() ?: "")
+            tracksSearchViewModel.search(tracksSearchViewModel.getLatestSearchText() ?: "")
         }
     }
 
@@ -195,10 +214,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showToast(additionalMessage: String) {
-        Toast.makeText(this, additionalMessage, Toast.LENGTH_LONG)
+        Toast.makeText(requireContext(), additionalMessage, Toast.LENGTH_LONG)
             .show()
     }
-    private fun clearButtonVisibility(s: CharSequence?): Int {
+
+    private fun clearTextButtonVisibility(s: CharSequence?): Int {
         return if (s.isNullOrEmpty()) {
             View.GONE
         } else {
@@ -218,18 +238,24 @@ class SearchActivity : AppCompatActivity() {
     }
     private fun showSearched(track: Track) {
         searchedTrackAdapter.addTrack(track)
-        viewModel.editSavedTrackList(searchedTrackAdapter.getCurrentTrackList())
+        tracksSearchViewModel.editSavedTrackList(searchedTrackAdapter.getCurrentTrackList())
         navigateTo(AudioplayerActivity::class.java, track)
     }
 
     private fun navigateTo(clazz: Class<out AppCompatActivity>, track: Track) {
         if (clickDebounce()) {
-            val intent = Intent(this, clazz)
+            val intent = Intent(requireContext(), clazz)
             intent.putExtra("TRACK", track)
             startActivity(intent)
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        inputEditText.setText("")
+        tracksSearchViewModel.renderState(TracksState.Default)
+
+    }
     companion object {
         const val SEARCHED_TRACK_SIZE = 10
         const val TRACK_LIST_KEY = "trackListKey"
