@@ -1,20 +1,22 @@
 package com.example.playlistmaker1.player.ui.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker1.player.domain.api.AudioplayerInteractor
 import com.example.playlistmaker1.player.ui.PlayStatus
 import com.example.playlistmaker1.search.domain.model.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
     private val audioplayerInteractor: AudioplayerInteractor,
 ) : ViewModel(){
 
     private var playStatusLiveData = MutableLiveData<PlayStatus>()
-    private val handler = Handler(Looper.getMainLooper())
+    private var timerJob: Job? = null
 
     fun preparePlayer(convertedTrack: Track) {
         audioplayerInteractor.preparePlayer(
@@ -51,8 +53,8 @@ class AudioPlayerViewModel(
 
     private fun startPlayer() {
         playStatusLiveData.value = getCurrentPlayStatus().copy(isPlaying = true)
-        handler.post(getCurrentTime())
         audioplayerInteractor.startPlayer()
+        startTimer()
     }
 
     fun pausePlayer() {
@@ -60,16 +62,14 @@ class AudioPlayerViewModel(
             audioplayerInteractor.pausePlayer()
         }
         playStatusLiveData.value = getCurrentPlayStatus().copy(isPlaying = false)
-        handler.removeCallbacks(getCurrentTime())
+        timerJob?.cancel()
     }
 
-    private fun getCurrentTime(): Runnable {
-        return object : Runnable {
-            override fun run() {
-                if (getCurrentPlayStatus().isPlaying) {
-                    playStatusLiveData.value = getCurrentPlayStatus().copy(progress = audioplayerInteractor.transferCurrentTime())
-                    handler.postDelayed(this, DELAY_MILLIS_Activity)
-                }
+    private fun startTimer() {
+        timerJob = viewModelScope.launch {
+            while (getCurrentPlayStatus().isPlaying) {
+                playStatusLiveData.value = getCurrentPlayStatus().copy(progress = audioplayerInteractor.transferCurrentTime())
+                delay( DELAY_MILLIS_Activity)
             }
         }
     }
@@ -79,7 +79,6 @@ class AudioPlayerViewModel(
     }
 
     override fun onCleared() {
-        handler.removeCallbacks(getCurrentTime())
         audioplayerInteractor.onDestroy()
     }
 

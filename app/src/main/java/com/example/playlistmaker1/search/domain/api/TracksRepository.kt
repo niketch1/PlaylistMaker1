@@ -2,10 +2,11 @@ package com.example.playlistmaker1.search.domain.api
 
 import com.example.playlistmaker1.creator.Resource
 import com.example.playlistmaker1.search.domain.model.Track
+import kotlinx.coroutines.flow.Flow
 
 interface TracksRepository {
 
-    fun searchTracks(text : String) : Resource<List<Track>>
+    fun searchTracks(text : String) : Flow<Resource<List<Track>>>
     fun getSavedTracks() : String?
     fun saveTrackListToHistory(jsonTrackList : String)
     fun clearTrackListFromHistory()
