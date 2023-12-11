@@ -8,7 +8,7 @@ import com.example.playlistmaker1.search.data.NetworkClient
 import com.example.playlistmaker1.search.data.SearchHistory
 import com.example.playlistmaker1.search.data.network.RetrofitNetworkClient
 import com.example.playlistmaker1.search.data.network.iTunesSearchAPI
-import com.example.playlistmaker1.search.ui.activity.SearchActivity.Companion.PLAYLIST_PREFERENCES
+import com.example.playlistmaker1.search.ui.fragment.SearchFragment.Companion.PLAYLIST_PREFERENCES
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import retrofit2.Retrofit

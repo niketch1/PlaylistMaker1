@@ -1,4 +1,4 @@
-package com.example.playlistmaker1.media.ui.fragments
+package com.example.playlistmaker1.media.ui.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,17 +14,17 @@ import org.koin.core.parameter.parametersOf
 class FavoritesFragment : Fragment() {
 
     companion object {
-        private const val FAVORITES_TRACK_DATA = "favorites_track_adapter"
+        private const val FAVORITES = "favorites"
 
         fun newInstance(favoritesTrackAdapter: String) = FavoritesFragment().apply {
             arguments = Bundle().apply {
-                putString(FAVORITES_TRACK_DATA, favoritesTrackAdapter)
+                putString(FAVORITES, favoritesTrackAdapter)
             }
         }
     }
 
     private val favoritesViewModel: FavoritesViewModel by viewModel {
-        parametersOf(requireArguments().getString(FAVORITES_TRACK_DATA))
+        parametersOf(requireArguments().getString(FAVORITES))
     }
 
     private lateinit var binding: FragmentFavoritesBinding

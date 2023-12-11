@@ -77,7 +77,7 @@ class TracksSearchViewModel(
                                     errorMessage = getApplication<Application>().getString(R.string.something_went_wrong)
                                 )
                             )
-                            showToast.postValue(errorMessage!!)
+                            showToast.postValue(errorMessage)
                         }
 
                         tracks.isEmpty() -> {
@@ -101,7 +101,7 @@ class TracksSearchViewModel(
         }
     }
 
-    private fun renderState(tracksState: TracksState){
+    fun renderState(tracksState: TracksState){
         stateLiveData.postValue(tracksState)
     }
 
