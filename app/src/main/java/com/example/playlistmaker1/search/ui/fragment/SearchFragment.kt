@@ -2,8 +2,6 @@ package com.example.playlistmaker1.search.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -17,9 +15,11 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker1.R
+import com.example.playlistmaker1.creator.debounce
 import com.example.playlistmaker1.databinding.FragmentSearchBinding
 import com.example.playlistmaker1.player.ui.activity.AudioplayerActivity
 import com.example.playlistmaker1.search.domain.model.Track
@@ -31,8 +31,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
 
-    private val mainThreadHandler = Handler(Looper.getMainLooper())
     private val tracksSearchViewModel by viewModel<TracksSearchViewModel>()
+    private lateinit var onTrackClickDebounce: (Track) -> Unit
 
     private val searchedTrackAdapter = SearchedTrackAdapter {
         showSearched(it)
@@ -41,7 +41,8 @@ class SearchFragment : Fragment() {
         showSearched(it)
     }
 
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private lateinit var progressBar: ProgressBar
     private lateinit var inputEditText: EditText
     private lateinit var recyclerView: RecyclerView
@@ -53,18 +54,32 @@ class SearchFragment : Fragment() {
     private lateinit var youSearched: TextView
     private lateinit var clearTextButton: ImageView
 
+    override fun onResume() {
+        tracksSearchViewModel.isScreenPaused = false
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        tracksSearchViewModel.isScreenPaused = true
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        //использование корутины с ФАЙЛОМ ДЕБАУНС
+        onTrackClickDebounce = debounce<Track>(CLICK_DEBOUNCE_DELAY_MILLIS, viewLifecycleOwner.lifecycleScope, false) { track ->
+            navigateTo(AudioplayerActivity::class.java, track)
+        }
 
         progressBar = binding.progressBar
         inputEditText = binding.inputEditText
@@ -91,7 +106,6 @@ class SearchFragment : Fragment() {
 
         tracksSearchViewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
-
         }
         tracksSearchViewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
@@ -167,8 +181,8 @@ class SearchFragment : Fragment() {
             is TracksState.Default-> showDefault()
             is TracksState.Loading -> showLoading()
             is TracksState.Content -> showContent(state.tracks)
-            is TracksState.Error -> showError(state.errorMessage)
-            is TracksState.Empty -> showEmpty(state.message)
+            is TracksState.Error -> showError(getString(state.errorMessage))
+            is TracksState.Empty -> showEmpty(getString(state.message))
         }
     }
 
@@ -226,36 +240,24 @@ class SearchFragment : Fragment() {
         }
     }
 
-    private var isClickAllowed = true
-
-    private fun clickDebounce() : Boolean {
-        val current = isClickAllowed
-        if (isClickAllowed) {
-            isClickAllowed = false
-            mainThreadHandler?.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY_MILLIS)
-        }
-        return current
-    }
     private fun showSearched(track: Track) {
         searchedTrackAdapter.addTrack(track)
         tracksSearchViewModel.editSavedTrackList(searchedTrackAdapter.getCurrentTrackList())
-        navigateTo(AudioplayerActivity::class.java, track)
+        onTrackClickDebounce(track)
     }
 
     private fun navigateTo(clazz: Class<out AppCompatActivity>, track: Track) {
-        if (clickDebounce()) {
-            val intent = Intent(requireContext(), clazz)
-            intent.putExtra("TRACK", track)
-            startActivity(intent)
-        }
+        val intent = Intent(requireContext(), clazz)
+        intent.putExtra("TRACK", track)
+        startActivity(intent)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         inputEditText.setText("")
-        tracksSearchViewModel.renderState(TracksState.Default)
-
+        _binding = null
     }
+
     companion object {
         const val SEARCHED_TRACK_SIZE = 10
         const val TRACK_LIST_KEY = "trackListKey"
