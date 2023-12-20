@@ -13,8 +13,8 @@ class TracksInteractorImpl(private val tracksRepository: TracksRepository): Trac
     override fun searchTracks(text: String): Flow<Pair<List<Track>?, String?>> {
         return tracksRepository.searchTracks(text).map{ resource ->
             when(resource){
-                is Resource.Success -> {Pair(resource.data, null)}
-                is Resource.Error -> { Pair(null, resource.message)}
+                is Resource.Success -> Pair(resource.data, null)
+                is Resource.Error ->  Pair(null, resource.message)
             }
         }
     }

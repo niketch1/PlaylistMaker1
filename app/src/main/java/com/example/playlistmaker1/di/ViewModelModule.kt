@@ -11,7 +11,7 @@ import org.koin.dsl.module
 val viewModelModule = module {
 
     viewModel {
-        TracksSearchViewModel(get(), get())
+        TracksSearchViewModel(get())
     }
 
     viewModel {

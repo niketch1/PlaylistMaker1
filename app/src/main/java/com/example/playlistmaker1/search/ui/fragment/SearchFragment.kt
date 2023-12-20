@@ -41,7 +41,8 @@ class SearchFragment : Fragment() {
         showSearched(it)
     }
 
-    private lateinit var binding: FragmentSearchBinding
+    private var _binding: FragmentSearchBinding? = null
+    private val binding get() = _binding!!
     private lateinit var progressBar: ProgressBar
     private lateinit var inputEditText: EditText
     private lateinit var recyclerView: RecyclerView
@@ -53,13 +54,22 @@ class SearchFragment : Fragment() {
     private lateinit var youSearched: TextView
     private lateinit var clearTextButton: ImageView
 
+    override fun onResume() {
+        tracksSearchViewModel.isScreenPaused = false
+        super.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        tracksSearchViewModel.isScreenPaused = true
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentSearchBinding.inflate(inflater, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -96,7 +106,6 @@ class SearchFragment : Fragment() {
 
         tracksSearchViewModel.observeState().observe(viewLifecycleOwner) {
             render(it)
-
         }
         tracksSearchViewModel.observeShowToast().observe(viewLifecycleOwner) { toast ->
             showToast(toast)
@@ -172,8 +181,8 @@ class SearchFragment : Fragment() {
             is TracksState.Default-> showDefault()
             is TracksState.Loading -> showLoading()
             is TracksState.Content -> showContent(state.tracks)
-            is TracksState.Error -> showError(state.errorMessage)
-            is TracksState.Empty -> showEmpty(state.message)
+            is TracksState.Error -> showError(getString(state.errorMessage))
+            is TracksState.Empty -> showEmpty(getString(state.message))
         }
     }
 
@@ -246,9 +255,9 @@ class SearchFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         inputEditText.setText("")
-        tracksSearchViewModel.renderState(TracksState.Default)
-
+        _binding = null
     }
+
     companion object {
         const val SEARCHED_TRACK_SIZE = 10
         const val TRACK_LIST_KEY = "trackListKey"

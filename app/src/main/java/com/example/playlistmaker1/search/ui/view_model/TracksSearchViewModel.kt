@@ -1,9 +1,8 @@
 package com.example.playlistmaker1.search.ui.view_model
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker1.R
 import com.example.playlistmaker1.creator.debounce
@@ -13,20 +12,19 @@ import com.example.playlistmaker1.search.ui.model.SingleLiveEvent
 import com.example.playlistmaker1.search.ui.model.TracksState
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 
 class TracksSearchViewModel(
-    application: Application,
     private val tracksInteractor: TracksInteractor,
-): AndroidViewModel(application) {
+): ViewModel() {
 
     companion object {
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
     val presavedTracks : MutableList<Track> = mutableListOf()
     private val itemType = object : TypeToken<ArrayList<Track>>() {}.type
+    var isScreenPaused: Boolean = false
 
     init {
         val savedTracks = tracksInteractor.getSavedTracks()
@@ -36,6 +34,7 @@ class TracksSearchViewModel(
     }
 
     private var latestSearchText: String? = null
+    private var trackState: TracksState? = null
 
     private val stateLiveData = MutableLiveData<TracksState>()
     fun observeState(): LiveData<TracksState> = stateLiveData
@@ -49,21 +48,22 @@ class TracksSearchViewModel(
     }
 
     fun searchDebounce(changedText: String) {
-        if (latestSearchText != changedText) {
-            latestSearchText = changedText
+        if (latestSearchText == changedText || changedText == "") {
+            return
         }
         trackSearchDebounce(changedText)
     }
 
     fun search(searchText: String) {
+        if(trackState != null) stateLiveData.postValue(trackState!!)
         if (searchText.isNotEmpty()) {
             renderState(TracksState.Loading)
 
             viewModelScope.launch {
                 tracksInteractor
                     .searchTracks(searchText)
-                    .collect{ pair ->
-                        processResult(pair.first, pair.second)
+                    .collect { pair ->
+                        if(!isScreenPaused) processResult(pair.first, pair.second)
                     }
             }
         }
@@ -77,8 +77,8 @@ class TracksSearchViewModel(
         when {
             errorMessage != null -> {
                 renderState(
-                    TracksState.Error(
-                        errorMessage = getApplication<Application>().getString(R.string.something_went_wrong)
+                     TracksState.Error(
+                        errorMessage = R.string.something_went_wrong
                     )
                 )
                 showToast.postValue(errorMessage)
@@ -87,7 +87,7 @@ class TracksSearchViewModel(
             tracks.isEmpty() -> {
                 renderState(
                     TracksState.Empty(
-                        message = getApplication<Application>().getString(R.string.nothing_found)
+                        message = R.string.nothing_found
                     )
                 )
             }
@@ -103,6 +103,7 @@ class TracksSearchViewModel(
     }
 
     fun renderState(tracksState: TracksState){
+        trackState = tracksState
         stateLiveData.postValue(tracksState)
     }
 
@@ -126,4 +127,6 @@ class TracksSearchViewModel(
     private fun createTrackListFromJson(json: String): ArrayList<Track>{
         return Gson().fromJson(json, itemType)
     }
+
+
 }

@@ -16,14 +16,15 @@ class SettingsFragment : Fragment() {
 
     private val settingsViewModel by viewModel<SettingsViewModel>()
 
-    private lateinit var binding: FragmentSettingsBinding
+    private var _binding: FragmentSettingsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var share: ImageView
     private lateinit var support: ImageView
     private lateinit var agreement: ImageView
     private lateinit var themeSwitcher: SwitchMaterial
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View?{
-        binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -52,5 +53,10 @@ class SettingsFragment : Fragment() {
             settingsViewModel.changeTheme(checked)
             App.appContext= requireContext()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
