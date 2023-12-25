@@ -22,6 +22,8 @@ class AudioplayerActivity : AppCompatActivity() {
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
     private lateinit var pauseButton: ImageButton
+    private lateinit var likeButton: ImageButton
+    private lateinit var alreadyLikedButton: ImageButton
     private val viewModel: AudioPlayerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,8 @@ class AudioplayerActivity : AppCompatActivity() {
         currentTrackTime.text = getString(R.string.start_time)
         playButton = findViewById(R.id.playButton)
         pauseButton = findViewById(R.id.pauseButton)
+        likeButton = findViewById(R.id.likeButton)
+        alreadyLikedButton = findViewById(R.id.alreadyLikedButton)
 
         val convertedTrack = intent.getSerializableExtra("TRACK") as Track
         Glide.with(this)
@@ -69,6 +73,7 @@ class AudioplayerActivity : AppCompatActivity() {
 
         viewModel.getPlayStatusLiveData().observe(this) { playStatus ->
             changeButtonStyle(playStatus)
+            changeLikeButtonStyle(playStatus)
             currentTrackTime.text = playStatus.progress
         }
 
@@ -77,6 +82,9 @@ class AudioplayerActivity : AppCompatActivity() {
         }
         pauseButton.setOnClickListener {
             viewModel.playbackControl()
+        }
+        likeButton.setOnClickListener{
+            viewModel.onFavoriteClicked(convertedTrack)
         }
     }
 
@@ -93,6 +101,18 @@ class AudioplayerActivity : AppCompatActivity() {
         else{
             pauseButton.visibility = View.GONE
             playButton.visibility = View.VISIBLE
+        }
+    }
+
+    private fun changeLikeButtonStyle(playStatus: PlayStatus){
+        if(playStatus.isFavorite) {
+            alreadyLikedButton.visibility = View.VISIBLE
+            alreadyLikedButton.setImageResource(R.drawable.liked_track)
+            likeButton.visibility = View.GONE
+        }
+        else{
+            alreadyLikedButton.visibility = View.GONE
+            likeButton.visibility = View.VISIBLE
         }
     }
 

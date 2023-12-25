@@ -19,7 +19,7 @@ class TracksInteractorImpl(private val tracksRepository: TracksRepository): Trac
         }
     }
 
-    override fun getSavedTracks(): String? {
+    override suspend fun getSavedTracks(): List<Track>? {
        return tracksRepository.getSavedTracks()
     }
 

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker1.media.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker1.player.domain.api.AudioplayerInteractor
 import com.example.playlistmaker1.player.ui.PlayStatus
 import com.example.playlistmaker1.search.domain.model.Track
@@ -13,12 +14,15 @@ import kotlinx.coroutines.launch
 
 class AudioPlayerViewModel(
     private val audioplayerInteractor: AudioplayerInteractor,
+    private val favoriteTrackInteractor: FavoriteTrackInteractor,
 ) : ViewModel(){
 
     private var playStatusLiveData = MutableLiveData<PlayStatus>()
     private var timerJob: Job? = null
+    var isFavorite: Boolean? = null
 
     fun preparePlayer(convertedTrack: Track) {
+        isFavorite = convertedTrack.isFavorite
         audioplayerInteractor.preparePlayer(
             url = convertedTrack.previewUrl,
             onPreparedCallback = {
@@ -27,7 +31,8 @@ class AudioPlayerViewModel(
                         progress = "00:00",
                         isPlaying = false,
                         prepared = true,
-                        completed = false
+                        completed = false,
+                        isFavorite = isFavorite!!
                     )
                 )
             },
@@ -37,7 +42,8 @@ class AudioPlayerViewModel(
                         progress = "00:00",
                         isPlaying = false,
                         prepared = true,
-                        completed = true
+                        completed = true,
+                        isFavorite = isFavorite!!
                     )
                 )
             }
@@ -45,6 +51,24 @@ class AudioPlayerViewModel(
     }
 
     fun getPlayStatusLiveData(): LiveData<PlayStatus> = playStatusLiveData
+
+    fun onFavoriteClicked(track: Track){
+        if(track.isFavorite) deleteFromFavorite(track)
+        else addToFavorite(track)
+    }
+    fun addToFavorite(track: Track){
+        viewModelScope.launch {
+            favoriteTrackInteractor.addTrackToFavorite(track)
+            playStatusLiveData.postValue(getCurrentPlayStatus())
+        }
+    }
+
+    fun deleteFromFavorite(track: Track){
+        viewModelScope.launch {
+            favoriteTrackInteractor.deleteTrackFromFavorites(track)
+            playStatusLiveData.postValue(getCurrentPlayStatus())
+        }
+    }
 
     fun playbackControl() {
         if(getCurrentPlayStatus().isPlaying) pausePlayer()
@@ -75,7 +99,7 @@ class AudioPlayerViewModel(
     }
 
     private fun getCurrentPlayStatus(): PlayStatus {
-        return playStatusLiveData.value ?: PlayStatus(progress = "00:00", isPlaying = false, prepared = false, completed = false)
+        return playStatusLiveData.value ?: PlayStatus(progress = "00:00", isPlaying = false, prepared = false, completed = false, isFavorite = isFavorite!!)
     }
 
     override fun onCleared() {

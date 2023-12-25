@@ -2,7 +2,9 @@ package com.example.playlistmaker1.di
 
 import android.content.Context
 import android.media.MediaPlayer
+import androidx.room.Room
 import com.example.playlistmaker1.App
+import com.example.playlistmaker1.media.data.AppDatabase
 import com.example.playlistmaker1.player.data.DataTimeFormatUtil
 import com.example.playlistmaker1.search.data.NetworkClient
 import com.example.playlistmaker1.search.data.SearchHistory
@@ -43,4 +45,8 @@ val dataModule = module {
         RetrofitNetworkClient(get(), androidContext())
     }
 
+    single {
+        Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
+            .build()
+    }
 }

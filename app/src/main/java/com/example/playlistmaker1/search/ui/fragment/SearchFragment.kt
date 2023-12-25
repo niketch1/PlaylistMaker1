@@ -261,7 +261,7 @@ class SearchFragment : Fragment() {
     companion object {
         const val SEARCHED_TRACK_SIZE = 10
         const val TRACK_LIST_KEY = "trackListKey"
-        private const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
+        const val CLICK_DEBOUNCE_DELAY_MILLIS = 1000L
         const val PLAYLIST_PREFERENCES = "playlistPreferences"
     }
 }

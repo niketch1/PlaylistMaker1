@@ -1,6 +1,7 @@
 package com.example.playlistmaker1.search.data
 
 import com.example.playlistmaker1.creator.Resource
+import com.example.playlistmaker1.media.data.AppDatabase
 import com.example.playlistmaker1.search.data.dto.ITunesResponse
 import com.example.playlistmaker1.search.data.dto.TrackDto
 import com.example.playlistmaker1.search.data.dto.TracksSearchRequest
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.flow
 class TracksRepositoryImpl(
     private val networkClient : NetworkClient,
     private val searchHistory: SearchHistory,
+    private val appDatabase: AppDatabase,
 ) : TracksRepository {
 
     override fun searchTracks(text: String): Flow<Resource<List<Track>>> = flow {
@@ -21,7 +23,9 @@ class TracksRepositoryImpl(
                 emit(Resource.Error("Проверьте подключение к интернету"))
             }
             200 ->{
-                emit(Resource.Success((response as ITunesResponse).results.map{it.mapToDomain()}))
+                val data = (response as ITunesResponse).results.map{it.mapToDomain()}
+                data.map{track: Track ->  if(getTrackIdList().contains(track.trackId)) track.isFavorite = true}
+                emit(Resource.Success(data))
             }
             else -> {
                 emit(Resource.Error(response.resultCode.toString()))
@@ -29,8 +33,11 @@ class TracksRepositoryImpl(
         }
     }
 
-    override fun getSavedTracks(): String? {
-        return searchHistory.reloadTracks()
+    override suspend fun getSavedTracks(): List<Track>? {
+        val data = searchHistory.reloadTracks()
+
+        data?.map{track: Track ->  if(getTrackIdList().contains(track.trackId)) track.isFavorite = true}
+        return data
     }
 
     override fun saveTrackListToHistory(jsonTrackList: String) {
@@ -54,6 +61,11 @@ class TracksRepositoryImpl(
             country = country,
             previewUrl = previewUrl
         )
+    }
+
+    private suspend fun getTrackIdList(): List<Int>{
+        val idList = appDatabase.trackDao().getTracksIdList()
+        return idList ?: emptyList()
     }
 }
 
