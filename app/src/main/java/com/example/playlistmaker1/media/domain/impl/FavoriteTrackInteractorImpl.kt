@@ -5,6 +5,7 @@ import com.example.playlistmaker1.media.domain.api.FavoriteTracksRepository
 import com.example.playlistmaker1.search.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 class FavoriteTrackInteractorImpl(private val favoriteTracksRepository: FavoriteTracksRepository): FavoriteTrackInteractor {
 
@@ -16,7 +17,7 @@ class FavoriteTrackInteractorImpl(private val favoriteTracksRepository: Favorite
         favoriteTracksRepository.deleteTrackFromFavorites(track)
     }
 
-    override fun getFavoriteTrackList(): Flow<List<Track>> {
-        return favoriteTracksRepository.getFavoriteTrackList()
+    override fun getFavoriteTrackList(): Flow<List<Track>>{
+        return  favoriteTracksRepository.getFavoriteTrackList()
     }
 }

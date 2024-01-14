@@ -61,6 +61,8 @@ class FavoritesFragment : Fragment() {
             navigateTo(AudioplayerActivity::class.java, track)
         }
 
+        favoritesViewModel.fillData()
+
         favoritesViewModel.observeFavorites().observe(viewLifecycleOwner) {
             render(it)
         }
@@ -76,10 +78,13 @@ class FavoritesFragment : Fragment() {
     private fun showEmpty(){
         binding.placeholderIconFavorites.visibility = View.VISIBLE
         binding.placeholderMessageFavorites.visibility = View.VISIBLE
+        binding.favoriteRecyclerView.visibility = View.GONE
     }
 
     private fun showContent(trackList: List<Track>){
         binding.favoriteRecyclerView.visibility = View.VISIBLE
+        binding.placeholderIconFavorites.visibility = View.GONE
+        binding.placeholderMessageFavorites.visibility = View.GONE
         trackAdapter.setTracks(trackList)
     }
 
@@ -88,7 +93,10 @@ class FavoritesFragment : Fragment() {
         intent.putExtra("TRACK", track)
         startActivity(intent)
     }
-
+    override fun onResume() {
+        super.onResume()
+        favoritesViewModel.fillData()
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

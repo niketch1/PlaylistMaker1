@@ -59,14 +59,16 @@ class AudioPlayerViewModel(
     fun addToFavorite(track: Track){
         viewModelScope.launch {
             favoriteTrackInteractor.addTrackToFavorite(track)
-            playStatusLiveData.postValue(getCurrentPlayStatus())
+            track.isFavorite = true
+            playStatusLiveData.value = getCurrentPlayStatus().copy(isFavorite = true)
         }
     }
 
     fun deleteFromFavorite(track: Track){
         viewModelScope.launch {
             favoriteTrackInteractor.deleteTrackFromFavorites(track)
-            playStatusLiveData.postValue(getCurrentPlayStatus())
+            track.isFavorite = false
+            playStatusLiveData.value = getCurrentPlayStatus().copy(isFavorite = false)
         }
     }
 
