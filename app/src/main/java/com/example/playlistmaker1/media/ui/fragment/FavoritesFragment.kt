@@ -61,8 +61,6 @@ class FavoritesFragment : Fragment() {
             navigateTo(AudioplayerActivity::class.java, track)
         }
 
-        favoritesViewModel.fillData()
-
         favoritesViewModel.observeFavorites().observe(viewLifecycleOwner) {
             render(it)
         }

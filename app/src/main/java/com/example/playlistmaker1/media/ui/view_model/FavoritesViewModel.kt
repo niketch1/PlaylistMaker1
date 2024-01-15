@@ -13,14 +13,14 @@ import kotlinx.coroutines.launch
 
 class FavoritesViewModel(private val favoriteTrackInteractor: FavoriteTrackInteractor,) : ViewModel() {
 
+    init {
+        fillData()
+    }
     fun fillData() {
         viewModelScope.launch {
              favoriteTrackInteractor
                  .getFavoriteTrackList()
                  .collect{ list ->
-                     list.map{
-                         track -> track.isFavorite = true
-                     }
                      processResult(list)
                  }
         }

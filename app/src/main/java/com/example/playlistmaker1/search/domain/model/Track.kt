@@ -13,5 +13,10 @@ data class Track (
     val primaryGenreName: String, // Жанр трека
     val country: String, // Страна исполнителя
     val previewUrl: String, // Отрывок
-    var isFavorite: Boolean = false
-) : Serializable
+    val isFavorite: Boolean = false
+) : Serializable{
+
+/*    fun copy(changedProperty : Boolean) : Track {
+        return Track(trackId, trackName, artistName, trackTimeMillis, artworkUrl100, collectionName, releaseDate, primaryGenreName, country, previewUrl, changedProperty)
+    }*/
+}

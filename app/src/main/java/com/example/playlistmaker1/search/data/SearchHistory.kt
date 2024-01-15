@@ -11,7 +11,7 @@ class SearchHistory(val sharedPrefs : SharedPreferences?){
 
     private val itemType = object : TypeToken<ArrayList<Track>>() {}.type
     fun reloadTracks(): List<Track>? {
-        return createTrackListFromJson(sharedPrefs?.getString(TRACK_LIST_KEY, null))
+        return createTrackListFromJson(sharedPrefs?.getString(TRACK_LIST_KEY, "[]"))
     }
     fun addToHistory(jsonTrackList : String){
         sharedPrefs?.edit()

@@ -49,7 +49,7 @@ class AudioplayerActivity : AppCompatActivity() {
         playButton = findViewById(R.id.playButton)
         likeButton = findViewById(R.id.likeButton)
 
-        val convertedTrack = intent.getSerializableExtra("TRACK") as Track
+        var convertedTrack = intent.getSerializableExtra("TRACK") as Track
         Glide.with(this)
             .load(convertedTrack.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg"))
             .centerCrop()
@@ -78,7 +78,8 @@ class AudioplayerActivity : AppCompatActivity() {
             viewModel.playbackControl()
         }
         likeButton.setOnClickListener{
-            viewModel.onFavoriteClicked(convertedTrack)
+            val changedTrack = viewModel.onFavoriteClicked(convertedTrack)
+            convertedTrack = changedTrack
         }
     }
 
