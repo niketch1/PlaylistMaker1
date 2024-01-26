@@ -29,4 +29,8 @@
     <string name="playlists">Плейлисты</string>
     <string name="your_media_is_empty">Ваша медиатека пуста</string>
     <string name="no_one_playlist">Вы не создали\nни одного плейлиста</string>
+    <string name="name">Название*</string>
+    <string name="description">Описание</string>
+    <string name="create">Создать</string>
+    <string name="addToPlaylist">Добавить в плейлист</string>
 </resources>

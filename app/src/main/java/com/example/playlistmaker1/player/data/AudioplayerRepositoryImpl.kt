@@ -30,8 +30,9 @@ class AudioplayerRepositoryImpl(
         mediaPlayer.pause()
     }
 
-    override fun onDestroy() {
-        mediaPlayer.release()
+    override fun stopPlayer() {
+        mediaPlayer.stop()
+        mediaPlayer.reset()
     }
 
 }

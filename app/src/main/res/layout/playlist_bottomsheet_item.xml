@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="5dp"
+    android:gravity="center_vertical"
+    android:background="@null"
+    android:orientation="horizontal"
+    android:foreground="?attr/selectableItemBackground">
+
+    <ImageView
+        android:id="@+id/playlistImage"
+        android:layout_margin="8dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        tools:src="@drawable/icon_placeholder"
+        android:scaleType="fitXY"
+        android:adjustViewBounds="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginVertical="14dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="44dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/playlistName"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_marginBottom="1dp"
+            style="@style/PlaylistBottomSheetNameStyle"
+            tools:text="Мой плейлист"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left">
+
+            <TextView
+                android:id="@+id/numberOfTracks"
+                style="@style/PlaylistBottomSheetDescriptionStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@id/tracks"
+                tools:text="99"/>
+
+            <TextView
+                android:id="@+id/tracks"
+                style="@style/PlaylistBottomSheetDescriptionStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="3dp"
+                android:layout_alignParentEnd="true"
+                tools:text="трек/трека/треков"/>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

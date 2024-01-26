@@ -29,4 +29,12 @@
     <dimen name="margin_bottom_text_button_back">12dp</dimen>
     <dimen name="margin_end_header_text">134dp</dimen>
     <dimen name="bottom_navigation_text">12dp</dimen>
+    <dimen name="button_create">16dp</dimen>
+    <dimen name="button_create_radius">8dp</dimen>
+    <dimen name="playlist_card_text_size">12sp</dimen>
+    <dimen name="playlist_image_radius">8dp</dimen>
+    <dimen name="playlist_bottom_sheet_name">16sp</dimen>
+    <dimen name="playlist_bottom_sheet_description">11sp</dimen>
+    <dimen name="playlist_icon_radius">2dp</dimen>
+    <dimen name="playlist_bottom_sheet_title">19sp</dimen>
 </resources>

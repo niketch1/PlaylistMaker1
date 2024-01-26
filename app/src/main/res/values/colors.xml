@@ -24,4 +24,12 @@
     <color name="switcher_track">#E6E8EB</color>
     <color name="tab_text">#1A1B22</color>
     <color name="media">#1A1B22</color>
+    <color name="new_playlist_text">#1A1B22</color>
+    <color name="new_playlist_background">#FFFFFFFF</color>
+    <color name="playlist_card">#1A1B22</color>
+    <color name="playlist_bottom_sheet_name">#FF000000</color>
+    <color name="playlist_bottom_sheet_description">#AEAFB4</color>
+    <color name="rounder">#E6E8EB</color>
+    <color name="playlist_bottom_sheet_title">#1A1B22</color>
+    <color name="bottom_sheet_background">#FFFFFFFF</color>
 </resources>

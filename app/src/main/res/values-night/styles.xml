@@ -90,4 +90,33 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">@dimen/bottom_navigation_text</item>
     </style>
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="">
+        <item name="colorPrimary">@color/blue</item>
+    </style>
+    <style name="PlaylistCardStyle" >
+        <item name="android:textColor">@color/playlist_card</item>
+        <item name="android:textSize">@dimen/playlist_card_text_size</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lines">1</item>
+    </style>
+    <style name="PlaylistBottomSheetNameStyle" >
+        <item name="android:textColor">@color/playlist_bottom_sheet_name</item>
+        <item name="android:textSize">@dimen/playlist_bottom_sheet_name</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lines">1</item>
+    </style>
+    <style name="PlaylistBottomSheetDescriptionStyle" >
+        <item name="android:textColor">@color/playlist_bottom_sheet_description</item>
+        <item name="android:textSize">@dimen/playlist_bottom_sheet_description</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:lines">1</item>
+    </style>
+    <style name="PlaylistBottomSheetTitleStyle" >
+        <item name="android:textColor">@color/playlist_bottom_sheet_title</item>
+        <item name="android:textSize">@dimen/playlist_bottom_sheet_title</item>
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+    </style>
 </resources>

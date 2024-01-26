@@ -6,5 +6,5 @@ interface AudioplayerRepository {
     fun startPlayer()
     fun pausePlayer()
     fun transferCurrentTime() : String
-    fun onDestroy()
+    fun stopPlayer()
 }
