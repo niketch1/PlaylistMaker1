@@ -8,7 +8,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        style="@style/BackgroundStyle">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/leftBorder"
@@ -120,40 +121,24 @@
             app:layout_constraintBottom_toTopOf="@id/currentTrackTime"
             app:layout_constraintEnd_toStartOf="@id/likeButton"
             style="@style/TitleStyle"
-            android:foreground="?attr/selectableItemBackground"
-            android:visibility="visible"/>
+            android:foreground="?attr/selectableItemBackground" />
 
-        <ImageButton
-            android:id="@+id/pauseButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintCircleRadius="69dp"
-            android:layout_marginBottom="12dp"
-            app:srcCompat="@drawable/pause"
-            android:background="@null"
-            app:layout_constraintStart_toEndOf="@id/addButton"
-            app:layout_constraintBottom_toTopOf="@id/currentTrackTime"
-            app:layout_constraintEnd_toStartOf="@id/likeButton"
-            style="@style/TitleStyle"
-            android:foreground="?attr/selectableItemBackground"
-            android:visibility="gone"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/likeButton"
             android:layout_width="51dp"
             android:layout_height="51dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/like"
             app:elevation="0dp"
             app:pressedTranslationZ="1dp"
             app:borderWidth="0dp"
             app:fabCustomSize="51dp"
             android:backgroundTint="@color/player_buttons"
-            app:tint="@android:color/white"
+            app:tint="@null"
             android:clickable="true"
             app:layout_constraintStart_toEndOf="@id/playButton"
             app:layout_constraintTop_toTopOf="@id/addButton"
-            app:layout_constraintEnd_toEndOf="@id/rightBorder"/>
+            app:layout_constraintEnd_toEndOf="@id/rightBorder" />
 
         <TextView
             android:id="@+id/currentTrackTime"

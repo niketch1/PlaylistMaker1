@@ -27,9 +27,11 @@ class TracksSearchViewModel(
     var isScreenPaused: Boolean = false
 
     init {
-        val savedTracks = tracksInteractor.getSavedTracks()
-        savedTracks?.let {
-            presavedTracks.addAll(createTrackListFromJson(savedTracks))
+        viewModelScope.launch {
+            val savedTracks = tracksInteractor.getSavedTracks()
+            savedTracks?.let {
+                presavedTracks.addAll(savedTracks)
+            }
         }
     }
 
@@ -123,10 +125,5 @@ class TracksSearchViewModel(
     private fun createJsonFromTrackList(trackList: List<Track>): String {
         return Gson().toJson(trackList)
     }
-
-    private fun createTrackListFromJson(json: String): ArrayList<Track>{
-        return Gson().fromJson(json, itemType)
-    }
-
 
 }

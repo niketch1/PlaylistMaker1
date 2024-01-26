@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.playlistmaker1.media.ui.fragment.MediaFragment">
+    tools:context="com.example.playlistmaker1.media.ui.fragment.MediaFragment"
+    style="@style/BackgroundStyle">
 
 
     <FrameLayout
@@ -40,7 +41,8 @@
         app:tabMode="fixed"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/media"
-        app:tabTextAppearance="@style/TabsStyle" />
+        app:tabTextAppearance="@style/TabsStyle"
+        style="@style/BackgroundStyle"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"

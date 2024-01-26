@@ -13,6 +13,7 @@ import com.example.playlistmaker1.player.ui.DateFormatUtil
 import com.example.playlistmaker1.player.ui.PlayStatus
 import com.example.playlistmaker1.player.ui.view_model.AudioPlayerViewModel
 import com.example.playlistmaker1.search.domain.model.Track
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -21,7 +22,7 @@ class AudioplayerActivity : AppCompatActivity() {
     private val dateFormatUtil = DateFormatUtil()
     private lateinit var currentTrackTime: TextView
     private lateinit var playButton: ImageButton
-    private lateinit var pauseButton: ImageButton
+    private lateinit var likeButton: FloatingActionButton
     private val viewModel: AudioPlayerViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,9 +47,9 @@ class AudioplayerActivity : AppCompatActivity() {
         currentTrackTime = findViewById(R.id.currentTrackTime)
         currentTrackTime.text = getString(R.string.start_time)
         playButton = findViewById(R.id.playButton)
-        pauseButton = findViewById(R.id.pauseButton)
+        likeButton = findViewById(R.id.likeButton)
 
-        val convertedTrack = intent.getSerializableExtra("TRACK") as Track
+        var convertedTrack = intent.getSerializableExtra("TRACK") as Track
         Glide.with(this)
             .load(convertedTrack.artworkUrl100.replaceAfterLast('/',"512x512bb.jpg"))
             .centerCrop()
@@ -69,30 +70,38 @@ class AudioplayerActivity : AppCompatActivity() {
 
         viewModel.getPlayStatusLiveData().observe(this) { playStatus ->
             changeButtonStyle(playStatus)
+            changeLikeButtonStyle(playStatus)
             currentTrackTime.text = playStatus.progress
         }
 
         playButton.setOnClickListener {
             viewModel.playbackControl()
         }
-        pauseButton.setOnClickListener {
-            viewModel.playbackControl()
+        likeButton.setOnClickListener{
+            val changedTrack = viewModel.onFavoriteClicked(convertedTrack)
+            convertedTrack = changedTrack
         }
     }
 
     private fun changeButtonStyle(playStatus: PlayStatus) {
         if(playStatus.completed){
-            pauseButton.visibility = View.GONE
-            playButton.visibility = View.VISIBLE
+            playButton.setImageResource(R.drawable.play)
             currentTrackTime.text = getString(R.string.start_time)
         }
         if(playStatus.isPlaying){
-            playButton.visibility = View.GONE
-            pauseButton.visibility = View.VISIBLE
+            playButton.setImageResource(R.drawable.pause)
         }
         else{
-            pauseButton.visibility = View.GONE
-            playButton.visibility = View.VISIBLE
+            playButton.setImageResource(R.drawable.play)
+        }
+    }
+
+    private fun changeLikeButtonStyle(playStatus: PlayStatus){
+        if(playStatus.isFavorite) {
+            likeButton.setImageResource(R.drawable.liked_track)
+        }
+        else{
+            likeButton.setImageResource(R.drawable.like)
         }
     }
 

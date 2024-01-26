@@ -5,4 +5,5 @@ data class PlayStatus (
     val isPlaying : Boolean,
     val prepared : Boolean,
     val completed : Boolean,
+    val isFavorite: Boolean,
     )
