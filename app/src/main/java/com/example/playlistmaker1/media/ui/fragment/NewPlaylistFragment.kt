@@ -46,11 +46,11 @@ class NewPlaylistFragment: Fragment() {
     val requester = PermissionRequester.instance()
     private var _binding: FragmentCreatePlaylistBinding? = null
     private val binding get() = _binding!!
-    private lateinit var buttonBack: LinearLayout
+/*    private lateinit var buttonBack: LinearLayout
     private lateinit var newPlaylistImage: ImageView
     private lateinit var newPlaylistNameInput: EditText
     private lateinit var descriptionInput: EditText
-    private lateinit var createPlaylistButton: Button
+    private lateinit var createPlaylistButton: Button*/
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     lateinit var confirmDialog: MaterialAlertDialogBuilder
     private var currentUri: Uri? = null
@@ -70,16 +70,16 @@ class NewPlaylistFragment: Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        buttonBack = binding.buttonBack
+/*        buttonBack = binding.buttonBack
         newPlaylistImage = binding.newPlaylistImage
         newPlaylistNameInput = binding.newPlaylistNameInput
         descriptionInput = binding.descriptionInput
-        createPlaylistButton = binding.createPlaylistButton
+        createPlaylistButton = binding.createPlaylistButton*/
 
         pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
                 if (uri != null) {
-                    newPlaylistImage.setImageURI(uri)
+                    binding.ivNewPlaylistImage.setImageURI(uri)
                     currentUri = uri
                 }
             }
@@ -93,13 +93,13 @@ class NewPlaylistFragment: Fragment() {
                 findNavController().popBackStack()
             }
 
-        buttonBack.setOnClickListener {
+        binding.llButtonBack.setOnClickListener {
             showDialog()
         }
 
-        createPlaylistButton.setOnClickListener {
+        binding.bCreatePlaylistButton.setOnClickListener {
             createPlaylist(currentPlaylist)
-            Toast.makeText(requireContext(), "Плейлист ${newPlaylistNameInput.text} создан", Toast.LENGTH_LONG)
+            Toast.makeText(requireContext(), "Плейлист ${binding.etNewPlaylistNameInput.text} создан", Toast.LENGTH_LONG)
                 .show()
             findNavController().popBackStack()
         }
@@ -110,7 +110,7 @@ class NewPlaylistFragment: Fragment() {
             }
         })
 
-        newPlaylistImage.setOnClickListener {
+        binding.ivNewPlaylistImage.setOnClickListener {
             lifecycleScope.launch {
                 requester.request(Manifest.permission.READ_MEDIA_IMAGES).collect { result ->
                     when (result) {
@@ -133,13 +133,13 @@ class NewPlaylistFragment: Fragment() {
             }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (newPlaylistNameInput.hasFocus() && s?.isEmpty() == true) markButtonDisable(createPlaylistButton)
-                else markButtonAble(createPlaylistButton)
+                if (binding.etNewPlaylistNameInput.hasFocus() && s?.isEmpty() == true) markButtonDisable(binding.bCreatePlaylistButton)
+                else markButtonAble(binding.bCreatePlaylistButton)
             }
             override fun afterTextChanged(s: Editable?) {
             }
         }
-        newPlaylistNameInput.addTextChangedListener(simpleTextWatcher)
+        binding.etNewPlaylistNameInput.addTextChangedListener(simpleTextWatcher)
 
     }
 
@@ -154,9 +154,9 @@ class NewPlaylistFragment: Fragment() {
     }
 
     private fun showDialog(){
-        if(!TextUtils.isEmpty(newPlaylistNameInput.text.toString().trim())||
-            !TextUtils.isEmpty(descriptionInput.text.toString().trim())||
-            newPlaylistImage.drawable != null) {
+        if(!TextUtils.isEmpty(binding.etNewPlaylistNameInput.text.toString().trim())||
+            !TextUtils.isEmpty(binding.etDescriptionInput.text.toString().trim())||
+            binding.ivNewPlaylistImage.drawable != null) {
             confirmDialog.show()
         }else findNavController().popBackStack()
     }
@@ -170,7 +170,7 @@ class NewPlaylistFragment: Fragment() {
             filePath.mkdirs()
         }
         //создаём экземпляр класса File, который указывает на файл внутри каталога
-        val file = File(filePath, "${newPlaylistNameInput.text}.jpg")
+        val file = File(filePath, "${binding.etNewPlaylistNameInput.text}.jpg")
         imageFilePath = file.toString()
         // создаём входящий поток байтов из выбранной картинки
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
@@ -185,14 +185,14 @@ class NewPlaylistFragment: Fragment() {
     private fun createPlaylist(playlist: Playlist){
         saveImageToPrivateStorage(currentUri)
         newPlaylistViewModel.addPlaylist(playlist.copy(
-            playlistName = newPlaylistNameInput.text.toString(),
-            playlistDescription = descriptionInput.text.toString(),
+            playlistName = binding.etNewPlaylistNameInput.text.toString(),
+            playlistDescription = binding.etDescriptionInput.text.toString(),
             imageFilePath = imageFilePath ?: setPlaceholder(),
         ) )
     }
 
     private fun setPlaceholder(): String{
-        newPlaylistImage.setImageResource(R.drawable.icon_placeholder)
+        binding.ivNewPlaylistImage.setImageResource(R.drawable.icon_placeholder)
         return ""
     }
 

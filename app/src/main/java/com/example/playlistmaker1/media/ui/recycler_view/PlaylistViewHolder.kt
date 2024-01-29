@@ -32,6 +32,7 @@ class PlaylistViewHolder(parent: ViewGroup) :
 
         titlePlayist.text = item.playlistName
         numberOfTracks.text = item.numberOfTracks.toString()
-        tracks.text = getTextEnding(item.numberOfTracks)
+        tracks.text = itemView.resources.getQuantityString(R.plurals.plurals_track, item.numberOfTracks)
+            //getTextEnding(item.numberOfTracks)
     }
 }

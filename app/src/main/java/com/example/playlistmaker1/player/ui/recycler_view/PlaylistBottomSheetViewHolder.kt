@@ -32,6 +32,6 @@ class PlaylistBottomSheetViewHolder(parent: ViewGroup) :
 
         playlistName.text = item.playlistName
         numberOfTracks.text = item.numberOfTracks.toString()
-        tracks.text = getTextEnding(item.numberOfTracks)
+        tracks.text = itemView.resources.getQuantityString(R.plurals.plurals_track, item.numberOfTracks)
     }
 }

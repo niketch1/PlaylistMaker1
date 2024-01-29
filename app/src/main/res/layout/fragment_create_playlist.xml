@@ -9,7 +9,7 @@
     style="@style/BackgroundStyle">
 
     <LinearLayout
-        android:id="@+id/buttonBack"
+        android:id="@+id/llButtonBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -45,7 +45,7 @@
         app:cardCornerRadius="8dp"
         android:backgroundTint="@color/new_playlist_background">
     <ImageView
-        android:id="@+id/newPlaylistImage"
+        android:id="@+id/ivNewPlaylistImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
@@ -64,7 +64,7 @@
         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined">
 
         <EditText
-            android:id="@+id/newPlaylistNameInput"
+            android:id="@+id/etNewPlaylistNameInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/name"
@@ -90,7 +90,7 @@
         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined">
 
         <EditText
-            android:id="@+id/descriptionInput"
+            android:id="@+id/etDescriptionInput"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/description"
@@ -107,7 +107,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
-        android:id="@+id/createPlaylistButton"
+        android:id="@+id/bCreatePlaylistButton"
         android:foreground="?attr/selectableItemBackground"
         style="@style/CreatePlaylistButtonStyle"
         android:layout_marginTop="170dp"

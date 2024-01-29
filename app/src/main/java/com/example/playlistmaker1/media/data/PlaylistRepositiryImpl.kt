@@ -20,8 +20,8 @@ class PlaylistRepositiryImpl (
 
         override suspend fun updatePlaylist(track: Track, playlist: Playlist) {
             playlist.trackIdList.add(track.trackId)
-            playlist.numberOfTracks += 1
-            appDatabase.playlistDao().updatePlaylist(playlistDbConverter.map(playlist))
+            appDatabase.playlistDao().updatePlaylist(playlistDbConverter.map(
+                playlist.copy(numberOfTracks = playlist.numberOfTracks + 1)))
             addTrackInPlaylistToDb(track)
 
         }
