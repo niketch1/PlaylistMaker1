@@ -2,8 +2,8 @@ package com.example.playlistmaker1.search.domain.impl
 
 
 import com.example.playlistmaker1.creator.Resource
-import com.example.playlistmaker1.search.domain.api.TracksRepository
 import com.example.playlistmaker1.search.domain.api.TracksInteractor
+import com.example.playlistmaker1.search.domain.api.TracksRepository
 import com.example.playlistmaker1.search.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

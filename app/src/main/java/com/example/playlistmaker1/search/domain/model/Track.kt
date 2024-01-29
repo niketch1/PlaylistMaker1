@@ -15,8 +15,4 @@ data class Track (
     val previewUrl: String, // Отрывок
     val isFavorite: Boolean = false
 ) : Serializable{
-
-/*    fun copy(changedProperty : Boolean) : Track {
-        return Track(trackId, trackName, artistName, trackTimeMillis, artworkUrl100, collectionName, releaseDate, primaryGenreName, country, previewUrl, changedProperty)
-    }*/
 }

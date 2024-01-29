@@ -27,14 +27,9 @@ class MediaFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val favorites = "favorites"
-        val playlists = "playlists"
-
         binding.viewPager.adapter = ViewPagerAdapter(
             fragmentManager = childFragmentManager,
             lifecycle = lifecycle,
-            favorites = favorites,
-            playlists = playlists
         )
 
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->

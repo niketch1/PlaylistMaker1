@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     <application
         android:name="com.example.playlistmaker1.App"
         android:allowBackup="true"
@@ -14,9 +15,6 @@
         android:theme="@style/Theme.PlaylistMaker"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity
-            android:name=".player.ui.activity.AudioplayerActivity"
-            android:exported="false" />
         <activity
             android:name=".root.RootActivity"
             android:exported="true"

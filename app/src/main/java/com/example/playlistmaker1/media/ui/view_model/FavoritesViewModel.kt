@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker1.media.domain.api.FavoriteTrackInteractor
 import com.example.playlistmaker1.media.ui.model.FavoriteState
 import com.example.playlistmaker1.search.domain.model.Track
-import com.example.playlistmaker1.search.ui.model.TracksState
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class FavoritesViewModel(private val favoriteTrackInteractor: FavoriteTrackInteractor,) : ViewModel() {

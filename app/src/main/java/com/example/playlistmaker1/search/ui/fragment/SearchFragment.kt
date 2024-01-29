@@ -1,6 +1,5 @@
 package com.example.playlistmaker1.search.ui.fragment
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -13,20 +12,21 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker1.R
 import com.example.playlistmaker1.creator.debounce
 import com.example.playlistmaker1.databinding.FragmentSearchBinding
-import com.example.playlistmaker1.player.ui.activity.AudioplayerActivity
+import com.example.playlistmaker1.player.ui.fragment.AudioplayerFragment
 import com.example.playlistmaker1.search.domain.model.Track
 import com.example.playlistmaker1.search.ui.model.TracksState
 import com.example.playlistmaker1.search.ui.recycler_view.SearchedTrackAdapter
 import com.example.playlistmaker1.search.ui.recycler_view.TrackAdapter
 import com.example.playlistmaker1.search.ui.view_model.TracksSearchViewModel
+import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
@@ -78,7 +78,8 @@ class SearchFragment : Fragment() {
 
         //использование корутины с ФАЙЛОМ ДЕБАУНС
         onTrackClickDebounce = debounce<Track>(CLICK_DEBOUNCE_DELAY_MILLIS, viewLifecycleOwner.lifecycleScope, false) { track ->
-            navigateTo(AudioplayerActivity::class.java, track)
+            findNavController().navigate(R.id.action_searchFragment_to_audioplayerFragment,
+                AudioplayerFragment.createArgs(createJsonFromTrack(track)))
         }
 
         progressBar = binding.progressBar
@@ -246,10 +247,8 @@ class SearchFragment : Fragment() {
         onTrackClickDebounce(track)
     }
 
-    private fun navigateTo(clazz: Class<out AppCompatActivity>, track: Track) {
-        val intent = Intent(requireContext(), clazz)
-        intent.putExtra("TRACK", track)
-        startActivity(intent)
+    private fun createJsonFromTrack(track: Track): String {
+        return Gson().toJson(track)
     }
 
     override fun onDestroyView() {
