@@ -14,9 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
@@ -38,24 +35,20 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 
 
-class NewPlaylistFragment: Fragment() {
+open class NewPlaylistFragment: Fragment() {
 
-    private val newPlaylistViewModel by viewModel<NewPlaylistViewModel>()
+    open val viewModel by viewModel<NewPlaylistViewModel>()
     val requester = PermissionRequester.instance()
-    private var _binding: FragmentCreatePlaylistBinding? = null
-    private val binding get() = _binding!!
-/*    private lateinit var buttonBack: LinearLayout
-    private lateinit var newPlaylistImage: ImageView
-    private lateinit var newPlaylistNameInput: EditText
-    private lateinit var descriptionInput: EditText
-    private lateinit var createPlaylistButton: Button*/
-    private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
+    var _binding: FragmentCreatePlaylistBinding? = null
+    val binding get() = _binding!!
+    open lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
     lateinit var confirmDialog: MaterialAlertDialogBuilder
-    private var currentUri: Uri? = null
-    private var imageFilePath: String? = null
-    private var currentPlaylist = Playlist()
+    open var currentUri: Uri? = null
+    var imageFilePath: String? = null
+    var currentPlaylist = Playlist()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,12 +62,6 @@ class NewPlaylistFragment: Fragment() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-/*        buttonBack = binding.buttonBack
-        newPlaylistImage = binding.newPlaylistImage
-        newPlaylistNameInput = binding.newPlaylistNameInput
-        descriptionInput = binding.descriptionInput
-        createPlaylistButton = binding.createPlaylistButton*/
 
         pickMedia =
             registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -96,6 +83,8 @@ class NewPlaylistFragment: Fragment() {
         binding.llButtonBack.setOnClickListener {
             showDialog()
         }
+        binding.tvTitle.text = resources.getString(R.string.new_playlist)
+        binding.bCreatePlaylistButton.text = resources.getString(R.string.create)
 
         binding.bCreatePlaylistButton.setOnClickListener {
             createPlaylist(currentPlaylist)
@@ -143,12 +132,12 @@ class NewPlaylistFragment: Fragment() {
 
     }
 
-    private fun markButtonDisable(button: Button) {
+    fun markButtonDisable(button: Button) {
         button.isEnabled = false
         button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.gray))
     }
 
-    private fun markButtonAble(button: Button) {
+    fun markButtonAble(button: Button) {
         button.isEnabled = true
         button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.blue))
     }
@@ -161,7 +150,7 @@ class NewPlaylistFragment: Fragment() {
         }else findNavController().popBackStack()
     }
 
-    private fun saveImageToPrivateStorage(uri: Uri?) {
+    fun saveImageToPrivateStorage(uri: Uri?) {
         uri ?: return
         //создаём экземпляр класса File, который указывает на нужный каталог
         val filePath = File(requireActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "myalbum")
@@ -169,29 +158,28 @@ class NewPlaylistFragment: Fragment() {
         if (!filePath.exists()){
             filePath.mkdirs()
         }
-        //создаём экземпляр класса File, который указывает на файл внутри каталога
-        val file = File(filePath, "${binding.etNewPlaylistNameInput.text}.jpg")
+        val file = File(filePath, "${binding.etNewPlaylistNameInput.text}${UUID.randomUUID()}.jpg")
         imageFilePath = file.toString()
         // создаём входящий поток байтов из выбранной картинки
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
         // создаём исходящий поток байтов в созданный выше файл
-        val outputStream = FileOutputStream(file)
+        val outputStream = FileOutputStream(file, false)
         // записываем картинку с помощью BitmapFactory
         BitmapFactory
             .decodeStream(inputStream)
             .compress(Bitmap.CompressFormat.JPEG, 30, outputStream)
     }
 
-    private fun createPlaylist(playlist: Playlist){
+    open fun createPlaylist(playlist: Playlist){
         saveImageToPrivateStorage(currentUri)
-        newPlaylistViewModel.addPlaylist(playlist.copy(
+        viewModel.addPlaylist(playlist.copy(
             playlistName = binding.etNewPlaylistNameInput.text.toString(),
             playlistDescription = binding.etDescriptionInput.text.toString(),
             imageFilePath = imageFilePath ?: setPlaceholder(),
         ) )
     }
 
-    private fun setPlaceholder(): String{
+    fun setPlaceholder(): String{
         binding.ivNewPlaylistImage.setImageResource(R.drawable.icon_placeholder)
         return ""
     }

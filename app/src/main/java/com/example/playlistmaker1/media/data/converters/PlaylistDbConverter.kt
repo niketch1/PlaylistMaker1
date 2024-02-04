@@ -46,11 +46,33 @@ class PlaylistDbConverter {
             System.currentTimeMillis())
     }
 
-    private fun createJsonFromTrackIdList(trackIdList: List<Int>): String {
+    fun map(trackInPlaylistEntity: TrackInPlaylistEntity): Track{
+        return Track(
+            trackInPlaylistEntity.trackId,
+            trackInPlaylistEntity.trackName,
+            trackInPlaylistEntity.artistName,
+            trackInPlaylistEntity.trackTimeMillis,
+            trackInPlaylistEntity.artworkUrl100,
+            trackInPlaylistEntity.collectionName,
+            trackInPlaylistEntity.releaseDate,
+            trackInPlaylistEntity.primaryGenreName,
+            trackInPlaylistEntity.country,
+            trackInPlaylistEntity.previewUrl,
+        )
+    }
+
+    fun map(stringList: List<String>): List<ArrayList<Int>>{
+        val list = stringList.map {
+            createTrackIdListFromJson(it)
+        }
+        return list
+    }
+
+    fun createJsonFromTrackIdList(trackIdList: List<Int>): String {
         return Gson().toJson(trackIdList)
     }
 
-    private fun createTrackIdListFromJson(json: String?): ArrayList<Int>{
+    fun createTrackIdListFromJson(json: String?): ArrayList<Int>{
         return Gson().fromJson(json, itemType)
     }
 }

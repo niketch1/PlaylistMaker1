@@ -5,7 +5,8 @@
     android:layout_marginStart="8dp"
     android:layout_marginTop="16dp"
     android:background="@null"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:foreground="?attr/selectableItemBackground">
 
     <ImageView
         android:id="@+id/playlistImage"

@@ -8,4 +8,20 @@
         <item quantity="many"> треков</item>
         <item quantity="other"> треков</item>
     </plurals>
+    <plurals name="plurals_track_1">
+        <item quantity="zero">%1$d треков</item>
+        <item quantity="one">%1$d трек</item>
+        <item quantity="two">%1$d трека</item>
+        <item quantity="few">%1$d трека</item>
+        <item quantity="many">%1$d треков</item>
+        <item quantity="other">%1$d треков</item>
+    </plurals>
+    <plurals name="plurals_minute">
+        <item quantity="zero">%1$s минут</item>
+        <item quantity="one">%1$s минута</item>
+        <item quantity="two">%1$s минуты</item>
+        <item quantity="few">%1$s минуты</item>
+        <item quantity="many">%1$s минут</item>
+        <item quantity="other">%1$s минут</item>
+    </plurals>
 </resources>
