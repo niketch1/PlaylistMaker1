@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface PlaylistRepository {
 
-    fun sharePlaylist(message: String)
-
     suspend fun deletePlaylist(playlist: Playlist)
 
     suspend fun createPlaylist(playlist: Playlist)

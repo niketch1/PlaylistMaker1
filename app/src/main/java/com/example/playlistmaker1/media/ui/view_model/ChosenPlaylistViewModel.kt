@@ -1,15 +1,24 @@
 package com.example.playlistmaker1.media.ui.view_model
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker1.App.Companion.scope
+import com.example.playlistmaker1.R
 import com.example.playlistmaker1.media.domain.api.PlaylistInteractor
 import com.example.playlistmaker1.media.domain.model.Playlist
 import com.example.playlistmaker1.search.domain.model.Track
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ChosenPlaylistViewModel(private val playlistInteractor: PlaylistInteractor) : ViewModel() {
+
+    var currentTrack: Track? = null
+    var currentPlaylist = Playlist()
+    var currentTrackList = mutableListOf<Track>()
 
     fun getPlaylistById(playlistId: Int) {
         viewModelScope.launch {
@@ -31,9 +40,9 @@ class ChosenPlaylistViewModel(private val playlistInteractor: PlaylistInteractor
         }
     }
 
-    fun deletePlaylist(playlist: Playlist){
-        viewModelScope.launch {
-            playlistInteractor.deletePlaylist(playlist)
+    fun deletePlaylist(){
+        scope.launch {
+            playlistInteractor.deletePlaylist(currentPlaylist)
         }
         playlistLiveData.postValue(null)
     }
@@ -45,22 +54,37 @@ class ChosenPlaylistViewModel(private val playlistInteractor: PlaylistInteractor
     fun observeTrackList(): LiveData<List<Track>> = trackListLiveData
 
     private fun processResultPlaylist(playlist: Playlist){
+        currentPlaylist = playlist
         getTracksFromPlaylist(playlist.trackIdList)
         playlistLiveData.postValue(playlist)
     }
 
     private fun processResultTrackList(trackList: List<Track>){
+        currentTrackList.clear()
+        currentTrackList.addAll(trackList)
         trackListLiveData.postValue(trackList)
     }
 
-    fun deleteTrackFromPlaylist(trackId: Int, playlist: Playlist){
+    fun deleteTrackFromPlaylist(){
         viewModelScope.launch {
-            playlistInteractor.deleteTrackFromPlaylist(trackId, playlist)
-            getPlaylistById(playlist.playlistId)
+            playlistInteractor.deleteTrackFromPlaylist(currentTrack!!.trackId, currentPlaylist)
+            getPlaylistById(currentPlaylist.playlistId)
         }
     }
 
-    fun sharePlaylist(message: String){
-        playlistInteractor.sharePlaylist(message)
+    fun sharePlaylist(context: Context){
+        val message = makeMessage(currentPlaylist, currentTrackList, context)
+        playlistInteractor.sharePlaylist(message, context)
+    }
+
+    private fun makeMessage(playlist: Playlist, trackList: List<Track>, context: Context): String{
+        return "${playlist.playlistName}\n" +
+                "${playlist.playlistDescription}\n" +
+                "${context.resources.getQuantityString(R.plurals.plurals_track_1, playlist.numberOfTracks, playlist.numberOfTracks)}\n" +
+                trackList.joinToString(separator = "\n",){
+                    "${trackList.indexOf(it)+1}" +
+                            ".${it.artistName} " +
+                            "- ${it.trackName}(${SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis)})"
+                }
     }
 }

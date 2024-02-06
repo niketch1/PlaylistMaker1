@@ -1,12 +1,13 @@
 package com.example.playlistmaker1.media.domain.api
 
+import android.content.Context
 import com.example.playlistmaker1.media.domain.model.Playlist
 import com.example.playlistmaker1.search.domain.model.Track
 import kotlinx.coroutines.flow.Flow
 
 interface PlaylistInteractor {
 
-    fun sharePlaylist(message: String)
+    fun sharePlaylist(message: String, context: Context)
 
     suspend fun deletePlaylist(playlist: Playlist)
 

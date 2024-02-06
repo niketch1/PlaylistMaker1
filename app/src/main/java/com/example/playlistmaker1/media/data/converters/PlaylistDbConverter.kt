@@ -12,52 +12,55 @@ class PlaylistDbConverter {
 
     fun map(playlist: Playlist): PlaylistEntity {
         return PlaylistEntity(
-            playlist.playlistId,
-            playlist.playlistName,
-            playlist.playlistDescription,
-            playlist.imageFilePath,
-            createJsonFromTrackIdList(playlist.trackIdList),
-            playlist.numberOfTracks,
-            System.currentTimeMillis())
+            playlistId = playlist.playlistId,
+            playlistName = playlist.playlistName,
+            playlistDescription = playlist.playlistDescription,
+            imageFilePath = playlist.imageFilePath,
+            trackIdList = createJsonFromTrackIdList(playlist.trackIdList),
+            numberOfTracks = playlist.numberOfTracks,
+            addTime = System.currentTimeMillis()
+        )
     }
 
     fun map(playlistEntity: PlaylistEntity): Playlist {
         return Playlist(
-            playlistEntity.playlistId,
-            playlistEntity.playlistName,
-            playlistEntity.playlistDescription,
-            playlistEntity.imageFilePath,
-            createTrackIdListFromJson(playlistEntity.trackIdList),
-            playlistEntity.numberOfTracks)
+            playlistId = playlistEntity.playlistId,
+            playlistName = playlistEntity.playlistName,
+            playlistDescription = playlistEntity.playlistDescription,
+            imageFilePath = playlistEntity.imageFilePath,
+            trackIdList = createTrackIdListFromJson(playlistEntity.trackIdList),
+            numberOfTracks = playlistEntity.numberOfTracks
+        )
     }
 
     fun map(track: Track): TrackInPlaylistEntity{
         return TrackInPlaylistEntity(
-            track.trackId,
-            track.trackName,
-            track.artistName,
-            track.trackTimeMillis,
-            track.artworkUrl100,
-            track.collectionName,
-            track.releaseDate,
-            track.primaryGenreName,
-            track.country,
-            track.previewUrl,
-            System.currentTimeMillis())
+            trackId = track.trackId,
+            trackName = track.trackName,
+            artistName = track.artistName,
+            trackTimeMillis = track.trackTimeMillis,
+            artworkUrl100 = track.artworkUrl100,
+            collectionName = track.collectionName,
+            releaseDate = track.releaseDate,
+            primaryGenreName = track.primaryGenreName,
+            country = track.country,
+            previewUrl = track.previewUrl,
+            addTime = System.currentTimeMillis()
+        )
     }
 
     fun map(trackInPlaylistEntity: TrackInPlaylistEntity): Track{
         return Track(
-            trackInPlaylistEntity.trackId,
-            trackInPlaylistEntity.trackName,
-            trackInPlaylistEntity.artistName,
-            trackInPlaylistEntity.trackTimeMillis,
-            trackInPlaylistEntity.artworkUrl100,
-            trackInPlaylistEntity.collectionName,
-            trackInPlaylistEntity.releaseDate,
-            trackInPlaylistEntity.primaryGenreName,
-            trackInPlaylistEntity.country,
-            trackInPlaylistEntity.previewUrl,
+            trackId = trackInPlaylistEntity.trackId,
+            trackName = trackInPlaylistEntity.trackName,
+            artistName = trackInPlaylistEntity.artistName,
+            trackTimeMillis = trackInPlaylistEntity.trackTimeMillis,
+            artworkUrl100 = trackInPlaylistEntity.artworkUrl100,
+            collectionName = trackInPlaylistEntity.collectionName,
+            releaseDate = trackInPlaylistEntity.releaseDate,
+            primaryGenreName = trackInPlaylistEntity.primaryGenreName,
+            country = trackInPlaylistEntity.country,
+            previewUrl = trackInPlaylistEntity.previewUrl,
         )
     }
 

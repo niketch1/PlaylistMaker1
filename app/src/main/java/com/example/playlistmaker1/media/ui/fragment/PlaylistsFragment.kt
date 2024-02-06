@@ -20,7 +20,6 @@ import com.example.playlistmaker1.media.ui.model.PlaylistsGridState
 import com.example.playlistmaker1.media.ui.recycler_view.PlaylistAdapter
 import com.example.playlistmaker1.media.ui.view_model.PlaylistsViewModel
 import com.example.playlistmaker1.search.ui.fragment.SearchFragment
-import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlaylistsFragment : Fragment() {
@@ -53,7 +52,7 @@ class PlaylistsFragment : Fragment() {
         //использование корутины с ФАЙЛОМ ДЕБАУНС
         onPlaylistClickDebounce = debounce<Playlist>(SearchFragment.CLICK_DEBOUNCE_DELAY_MILLIS, viewLifecycleOwner.lifecycleScope, false) { playlist ->
             findNavController().navigate(R.id.action_mediaFragment_to_chosenPlaylistFragment,
-                ChosenPlaylistFragment.createArgs(playlist.playlistId.toString()))
+                ChosenPlaylistFragment.createArgs(playlist.playlistId))
         }
 
         playlistRecyclerView = binding.playlistRecyclerView
@@ -104,9 +103,5 @@ class PlaylistsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    private fun createJsonFromPlaylist(playlist: Playlist): String {
-        return Gson().toJson(playlist)
     }
 }

@@ -21,7 +21,7 @@ class EditPlaylistFragment: NewPlaylistFragment() {
 
     companion object {
         private const val PLAYLISTID = "playlistId"
-        fun createArgs(playlistId: String): Bundle =
+        fun createArgs(playlistId: Int): Bundle =
             bundleOf(
                 PLAYLISTID to playlistId)
     }
@@ -30,8 +30,7 @@ class EditPlaylistFragment: NewPlaylistFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val convertedPlaylistId =  requireArguments().getString(PLAYLISTID)!!
-            .toInt()!!
+        val convertedPlaylistId =  requireArguments().getInt(PLAYLISTID)
 
         binding.tvTitle.text = resources.getString(R.string.edit)
         binding.bCreatePlaylistButton.text = resources.getString(R.string.save)

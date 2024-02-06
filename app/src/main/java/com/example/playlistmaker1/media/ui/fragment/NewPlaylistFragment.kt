@@ -4,7 +4,6 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.text.Editable
@@ -19,7 +18,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -59,7 +57,6 @@ open class NewPlaylistFragment: Fragment() {
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -72,11 +69,11 @@ open class NewPlaylistFragment: Fragment() {
             }
 
         confirmDialog = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Завершить создание плейлиста?")
-            .setMessage("Все несохраненные данные будут потеряны")
-            .setNeutralButton("Отмена") { dialog, which ->
+            .setTitle(R.string.comlete_playlist_creation)
+            .setMessage(R.string.unsaved_data_will_be_lost)
+            .setNeutralButton(R.string.cancel) { dialog, which ->
                 // ничего не делаем
-            }.setPositiveButton("Завершить") { dialog, which ->
+            }.setPositiveButton(R.string.complete) { dialog, which ->
                 findNavController().popBackStack()
             }
 
@@ -101,7 +98,7 @@ open class NewPlaylistFragment: Fragment() {
 
         binding.ivNewPlaylistImage.setOnClickListener {
             lifecycleScope.launch {
-                requester.request(Manifest.permission.READ_MEDIA_IMAGES).collect { result ->
+                requester.request(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_MEDIA_IMAGES).collect { result ->
                     when (result) {
                         is PermissionResult.Granted -> {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))

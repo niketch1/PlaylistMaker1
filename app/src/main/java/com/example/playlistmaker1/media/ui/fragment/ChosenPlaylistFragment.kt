@@ -13,11 +13,10 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker1.R
+import com.example.playlistmaker1.creator.DateTimeUtil.showSumTracksTime
 import com.example.playlistmaker1.creator.debounce
 import com.example.playlistmaker1.databinding.FragmentChosenPlaylistBinding
-import com.example.playlistmaker1.media.domain.model.Playlist
 import com.example.playlistmaker1.media.ui.recycler_view.ChosenPlaylistTrackAdapter
-import com.example.playlistmaker1.media.ui.view_model.ChosenPlaylistActivityViewModel
 import com.example.playlistmaker1.media.ui.view_model.ChosenPlaylistViewModel
 import com.example.playlistmaker1.player.ui.fragment.AudioplayerFragment
 import com.example.playlistmaker1.search.domain.model.Track
@@ -25,10 +24,7 @@ import com.example.playlistmaker1.search.ui.fragment.SearchFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
-import org.koin.androidx.viewmodel.ext.android.activityViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class ChosenPlaylistFragment: Fragment() {
 
@@ -36,7 +32,7 @@ class ChosenPlaylistFragment: Fragment() {
 
     companion object {
         private const val PLAYLISTID = "playlistId"
-        fun createArgs(playlistId: String): Bundle =
+        fun createArgs(playlistId: Int): Bundle =
             bundleOf(
                 PLAYLISTID to playlistId)
     }
@@ -44,19 +40,13 @@ class ChosenPlaylistFragment: Fragment() {
     private val trackAdapter = ChosenPlaylistTrackAdapter({ track ->
         onTrackClickDebounce(track)
     },{ track ->
-        currentTrack = track
-        confirmDialogDeleteTrack.show()
+        chosenPlaylistViewModel.currentTrack = track
+        showConfirmDialogDeleteTrack()
     })
 
     private val chosenPlaylistViewModel by viewModel<ChosenPlaylistViewModel>()
-    private val chosenPlaylistActivityViewModel by activityViewModel<ChosenPlaylistActivityViewModel>()
     private var _binding: FragmentChosenPlaylistBinding? = null
     private val binding get() = _binding!!
-    lateinit var confirmDialogDeleteTrack: MaterialAlertDialogBuilder
-    lateinit var confirmDialogDeletePlaylist: MaterialAlertDialogBuilder
-    private var currentTrack: Track? = null
-    private var currentPlaylist = Playlist()
-    private var currentTrackList = mutableListOf<Track>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -76,35 +66,13 @@ class ChosenPlaylistFragment: Fragment() {
                 AudioplayerFragment.createArgs(createJsonFromTrack(track)))
         }
 
-        confirmDialogDeleteTrack = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Хотите удалить трек?")
-            .setNegativeButton("Нет") { dialog, which ->
-                // ничего не делаем
-            }.setPositiveButton("Да") { dialog, which ->
-                chosenPlaylistViewModel.deleteTrackFromPlaylist(currentTrack!!.trackId,currentPlaylist)
-            }
+        val convertedPlaylistId = requireArguments().getInt(PLAYLISTID)
 
-        confirmDialogDeletePlaylist = MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Хотите удалить плейлист ${currentPlaylist.playlistName} ?")
-            .setNegativeButton("Нет") { dialog, which ->
-                // ничего не делаем
-            }.setPositiveButton("Да") { dialog, which ->
-                chosenPlaylistActivityViewModel.deletePlaylist(currentPlaylist)
-
-            }
-
-        val convertedPlaylistId =  requireArguments().getString(PLAYLISTID)!!
-            .toInt()!!
 
         chosenPlaylistViewModel.getPlaylistById(convertedPlaylistId)
 
-        chosenPlaylistActivityViewModel.observeChosenPlaylist().observe(viewLifecycleOwner) {
-            if(it == null) findNavController().popBackStack()
-        }
-
         chosenPlaylistViewModel.observeChosenPlaylist().observe(viewLifecycleOwner) {
             if(it !== null) {
-                currentPlaylist = it
                 binding.tvPlaylistName.text = it.playlistName
                 binding.tvDescription.text = it.playlistDescription
                 binding.tvTrackNumbers.text = resources.getQuantityString(
@@ -116,7 +84,7 @@ class ChosenPlaylistFragment: Fragment() {
                 binding.innerPlaylistItem.numberOfTracks.text = it.numberOfTracks.toString()
                 binding.innerPlaylistItem.tracks.text =
                     this.resources.getQuantityString(R.plurals.plurals_track, it.numberOfTracks)
-
+                showTracklist(it.numberOfTracks)
                 Glide.with(this)
                     .load(it.imageFilePath)
                     .centerCrop()
@@ -134,20 +102,18 @@ class ChosenPlaylistFragment: Fragment() {
         }
 
         chosenPlaylistViewModel.observeTrackList().observe(viewLifecycleOwner) {
-            binding.tvMinuteNumbers.text = showSumTracksTime(it)
+            binding.tvMinuteNumbers.text = showSumTracksTime(it, requireContext())
             trackAdapter.setTracks(it)
-            currentTrackList.clear()
-            currentTrackList.addAll(it)
         }
 
         binding.rvBottomSheet.adapter = trackAdapter
-
 
         val bottomSheetMoreBehavior = BottomSheetBehavior.from(binding.llBottomSheetShare).apply {
             state = BottomSheetBehavior.STATE_HIDDEN
         }
         val bottomSheetTracksBehavior = BottomSheetBehavior.from(binding.llBottomSheet).apply {
             state = BottomSheetBehavior.STATE_COLLAPSED
+
         }
 
         bottomSheetMoreBehavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
@@ -192,41 +158,65 @@ class ChosenPlaylistFragment: Fragment() {
 
         binding.flbottomSheetEdit.setOnClickListener{
             findNavController().navigate(R.id.action_chosenPlaylistFragment_to_editPlaylistFragment,
-                EditPlaylistFragment.createArgs(currentPlaylist.playlistId.toString()))
+                EditPlaylistFragment.createArgs(chosenPlaylistViewModel.currentPlaylist.playlistId))
         }
 
         binding.flbottomSheetDelete.setOnClickListener {
             bottomSheetMoreBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            confirmDialogDeletePlaylist.show()
+            showConfirmDialogDeletePlaylist()
 
         }
+    }
+
+    private fun showConfirmDialogDeletePlaylist(){
+        val stringDelete = requireContext().resources.getString(R.string.want_to_delete_playlist)
+        val confirmDialogDeletePlaylistBuilder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("$stringDelete \u00AB${chosenPlaylistViewModel.currentPlaylist.playlistName}\u00BB?")
+            .setNegativeButton(R.string.no) { dialog, which ->
+                // ничего не делаем
+            }.setPositiveButton(R.string.yes) { dialog, which ->
+                chosenPlaylistViewModel
+                    .deletePlaylist()
+
+            }
+        confirmDialogDeletePlaylistBuilder.show()
+    }
+
+    private fun showConfirmDialogDeleteTrack(){
+        val confirmDialogDeleteTrackBuilder = MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.want_to_delete_track)
+            .setNegativeButton(R.string.no) { dialog, which ->
+                // ничего не делаем
+            }.setPositiveButton(R.string.yes) { dialog, which ->
+                chosenPlaylistViewModel.deleteTrackFromPlaylist()
+            }
+        confirmDialogDeleteTrackBuilder.show()
     }
 
     private fun createJsonFromTrack(track: Track): String {
         return Gson().toJson(track)
     }
 
-    private fun showSumTracksTime(trackList: List<Track>): String{
-        val totalTimeLong = trackList.sumOf { it.trackTimeMillis }
-        val totalTimeString = SimpleDateFormat("mm", Locale.getDefault()).format(totalTimeLong.toInt())
-        return resources.getQuantityString(R.plurals.plurals_minute, totalTimeString.toInt(), totalTimeString)
-    }
 
-    private fun makeMessage(playlist: Playlist, trackList: List<Track>): String{
-        return "${playlist.playlistName}\n" +
-                "${playlist.playlistDescription}\n" +
-                "${resources.getQuantityString(R.plurals.plurals_track_1, playlist.numberOfTracks, playlist.numberOfTracks)}\n" +
-                trackList.joinToString(separator = "\n",){
-                    "${trackList.indexOf(it)+1}.${it.artistName} - ${it.trackName}(${SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis)})"
-                }
-    }
 
     private fun sharePlaylist(){
-        if(currentPlaylist.numberOfTracks == 0){
-            Toast.makeText(requireContext(), "В этом плейлисте нет списка треков, которым можно поделиться", Toast.LENGTH_LONG).show()
+        if(chosenPlaylistViewModel.currentPlaylist.numberOfTracks == 0){
+            Toast.makeText(requireContext(), R.string.toast_share_playlist, Toast.LENGTH_LONG).show()
         }
         else{
-            chosenPlaylistViewModel.sharePlaylist(makeMessage(currentPlaylist, currentTrackList))
+            chosenPlaylistViewModel
+                .sharePlaylist(requireContext())
         }
     }
+
+    private fun showTracklist(numberOfTracks : Int){
+        if(numberOfTracks == 0){
+            binding.rvBottomSheet.visibility = View.GONE
+            binding.tvPlaceholderText.visibility = View.VISIBLE
+        }else{
+            binding.rvBottomSheet.visibility = View.VISIBLE
+            binding.tvPlaceholderText.visibility = View.GONE
+        }
+    }
+
 }

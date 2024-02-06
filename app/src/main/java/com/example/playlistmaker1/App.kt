@@ -9,6 +9,7 @@ import com.example.playlistmaker1.di.interactorModule
 import com.example.playlistmaker1.di.repositoryModule
 import com.example.playlistmaker1.di.viewModelModule
 import com.markodevcic.peko.PermissionRequester
+import kotlinx.coroutines.MainScope
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -32,6 +33,7 @@ class App : Application() {
         switchTheme(darkTheme)
     }
 
+
     fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
         AppCompatDelegate.setDefaultNightMode(
@@ -54,7 +56,9 @@ class App : Application() {
         return isNight
     }
 
+
     companion object {
         lateinit var appContext: Context
+        val scope = MainScope()
     }
 }
