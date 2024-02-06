@@ -29,6 +29,7 @@ class PlaylistsFragment : Fragment() {
     }
 
     private val playlistAdapter = PlaylistAdapter {
+        onPlaylistClickDebounce(it)
     }
     private lateinit var onPlaylistClickDebounce: (Playlist) -> Unit
     private val playlistsViewModel by viewModel<PlaylistsViewModel>()
@@ -50,7 +51,8 @@ class PlaylistsFragment : Fragment() {
 
         //использование корутины с ФАЙЛОМ ДЕБАУНС
         onPlaylistClickDebounce = debounce<Playlist>(SearchFragment.CLICK_DEBOUNCE_DELAY_MILLIS, viewLifecycleOwner.lifecycleScope, false) { playlist ->
-
+            findNavController().navigate(R.id.action_mediaFragment_to_chosenPlaylistFragment,
+                ChosenPlaylistFragment.createArgs(playlist.playlistId))
         }
 
         playlistRecyclerView = binding.playlistRecyclerView

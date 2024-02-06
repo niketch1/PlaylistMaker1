@@ -25,9 +25,9 @@
             style="@style/TitleStyle" />
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/new_playlist"
             android:textSize="@dimen/main_text_size"
             android:layout_marginTop="@dimen/margin_top_text_button_back"
             android:layout_marginStart="@dimen/margin_start_header_text"
@@ -106,15 +106,19 @@
             android:textCursorDrawable="@drawable/cursor"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
-        android:id="@+id/bCreatePlaylistButton"
-        android:foreground="?attr/selectableItemBackground"
-        style="@style/CreatePlaylistButtonStyle"
-        android:layout_marginTop="170dp"
-        android:layout_marginHorizontal="17dp"
-        android:insetTop="0dp"
-        android:insetBottom="0dp"
-        android:text="@string/create"
-        android:layout_gravity="center"
-        android:enabled="false"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/bCreatePlaylistButton"
+            android:foreground="?attr/selectableItemBackground"
+            style="@style/CreatePlaylistButtonStyle"
+            android:layout_marginBottom="32dp"
+            android:layout_marginHorizontal="17dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:layout_gravity="bottom"
+            android:enabled="false"/>
+    </FrameLayout>
 </LinearLayout>

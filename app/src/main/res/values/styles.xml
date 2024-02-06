@@ -137,4 +137,29 @@
         <item name="android:textSize">@dimen/playlist_bottom_sheet_title</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
     </style>
+    <style name="PlaylistNameStyle" >
+        <item name="android:textColor">@color/app_black</item>
+        <item name="android:textSize">@dimen/playlist_name</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="PlaylistDescriptionStyle" >
+        <item name="android:textColor">@color/app_black</item>
+        <item name="android:textSize">@dimen/playlist_description</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="PlaylistBottomSheetShareStyle" >
+        <item name="android:textColor">@color/playlist_bottom_sheet_title</item>
+        <item name="android:textSize">@dimen/playlist_bottom_sheet_name</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
 </resources>

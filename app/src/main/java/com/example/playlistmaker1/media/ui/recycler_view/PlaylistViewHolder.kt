@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker1.R
-import com.example.playlistmaker1.creator.getTextEnding
 import com.example.playlistmaker1.media.domain.model.Playlist
 
 class PlaylistViewHolder(parent: ViewGroup) :
@@ -33,6 +32,5 @@ class PlaylistViewHolder(parent: ViewGroup) :
         titlePlayist.text = item.playlistName
         numberOfTracks.text = item.numberOfTracks.toString()
         tracks.text = itemView.resources.getQuantityString(R.plurals.plurals_track, item.numberOfTracks)
-            //getTextEnding(item.numberOfTracks)
     }
 }
